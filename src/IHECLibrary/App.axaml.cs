@@ -265,7 +265,8 @@ namespace IHECLibrary
                 provider.GetRequiredService<INavigationService>(),
                 provider.GetRequiredService<IUserService>(),
                 provider.GetRequiredService<IBookService>(),
-                provider.GetRequiredService<IAuthService>()
+                provider.GetRequiredService<IAuthService>(),
+                provider.GetRequiredService<Supabase.Client>()
             ));
             
             services.AddTransient<ChatbotViewModel>(provider => new ChatbotViewModel(

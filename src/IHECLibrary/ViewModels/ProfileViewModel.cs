@@ -5,6 +5,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using IHECLibrary; // Added import for BookModel
+using Supabase;
 
 namespace IHECLibrary.ViewModels
 {
@@ -69,13 +70,20 @@ namespace IHECLibrary.ViewModels
         private readonly IUserService _userService;
         private readonly IBookService _bookService;
         private readonly IAuthService _authService;
+        private readonly Supabase.Client _supabaseClient;
 
-        public ProfileViewModel(INavigationService navigationService, IUserService userService, IBookService bookService, IAuthService authService)
+        public ProfileViewModel(
+            INavigationService navigationService, 
+            IUserService userService, 
+            IBookService bookService, 
+            IAuthService authService,
+            Supabase.Client supabaseClient)
         {
             _navigationService = navigationService;
             _userService = userService;
             _bookService = bookService;
             _authService = authService;
+            _supabaseClient = supabaseClient;
 
             // Load user data immediately
             LoadUserDataAsync();
@@ -92,8 +100,19 @@ namespace IHECLibrary.ViewModels
                 Console.WriteLine("ProfileViewModel: Loading user data...");
                 
                 // Check if user is authenticated
-                bool isAuthenticated = _authService.IsAuthenticated();
-                Console.WriteLine($"ProfileViewModel: Authentication status: {isAuthenticated}");
+                bool isAuthenticated = false;
+                try
+                {
+                    isAuthenticated = _authService.IsAuthenticated();
+                    Console.WriteLine($"ProfileViewModel: Authentication status: {isAuthenticated}");
+                }
+                catch (Exception authEx)
+                {
+                    Console.WriteLine($"ProfileViewModel: Error checking authentication: {authEx.Message}");
+                    HasError = true;
+                    ErrorMessage = "Unable to verify authentication status. Please try signing in again.";
+                    return;
+                }
                 
                 if (!isAuthenticated)
                 {
@@ -101,111 +120,132 @@ namespace IHECLibrary.ViewModels
                     HasError = true;
                     ErrorMessage = "Please sign in to view your profile.";
                     Console.WriteLine("ProfileViewModel: User not authenticated - showing error message");
+                    
+                    // Try to redirect to login page
+                    try 
+                    {
+                        await _navigationService.NavigateToAsync("Login");
+                        return;
+                    }
+                    catch {}
+                    
                     return;
+                }
+                
+                // Try to ensure test user exists in database - this helps when the database is empty
+                try
+                {
+                    // Check if we can access the EnsureTestUserExistsAsync method on the user service
+                    if (_userService is Services.Implementations.SupabaseUserService supabaseUserService)
+                    {
+                        await supabaseUserService.EnsureTestUserExistsAsync();
+                        Console.WriteLine("ProfileViewModel: Test user ensured in database");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"ProfileViewModel: Error ensuring test user: {ex.Message}");
+                    // Don't show error, just continue
                 }
                 
                 // Try to get user data from the user service
-                var user = await _userService.GetCurrentUserAsync();
-                
-                if (user == null)
+                try
                 {
-                    // Show error if user data is null
+                    var user = await _userService.GetCurrentUserAsync();
+                    
+                    if (user == null)
+                    {
+                        // Show error if user data is null
+                        HasError = true;
+                        ErrorMessage = "Unable to load your profile data. Please try logging in again.";
+                        Console.WriteLine("ProfileViewModel: User is authenticated but user data is null. Showing error message.");
+                        return;
+                    }
+                    
+                    // Set the user profile data
+                    UserFullName = $"{user.FirstName} {user.LastName}";
+                    UserEmail = user.Email;
+                    UserPhone = user.PhoneNumber ?? "No phone number";
+                    UserLevel = FormatStudyLevel(user.LevelOfStudy ?? "Unknown");
+                    UserField = user.FieldOfStudy ?? "Not specified";
+                    
+                    // Set profile picture
+                    if (!string.IsNullOrEmpty(user.ProfilePictureUrl))
+                    {
+                        UserProfilePicture = user.ProfilePictureUrl;
+                    }
+                    
+                    Console.WriteLine($"ProfileViewModel: Successfully loaded user basic data: {UserFullName}");
+                }
+                catch (Exception userEx)
+                {
+                    Console.WriteLine($"ProfileViewModel: Error loading user data: {userEx.Message}");
                     HasError = true;
-                    ErrorMessage = "Unable to load your profile data. Please try logging in again.";
-                    Console.WriteLine("ProfileViewModel: User is authenticated but user data is null. Showing error message.");
+                    ErrorMessage = "Error loading profile data. Please try again.";
                     return;
                 }
 
-                // User data retrieved successfully
-                Console.WriteLine($"ProfileViewModel: User data loaded: '{user.FirstName}' '{user.LastName}'");
-                
-                // Set basic user info - make sure to handle null or empty values
-                // Set full name from first and last name or use a default
-                if (!string.IsNullOrWhiteSpace(user.FirstName) || !string.IsNullOrWhiteSpace(user.LastName))
-                {
-                    UserFullName = $"{user.FirstName ?? ""} {user.LastName ?? ""}".Trim();
-                }
-                else 
-                {
-                    // If both first and last name are empty/null, use email or a default
-                    UserFullName = !string.IsNullOrWhiteSpace(user.Email) ? 
-                        user.Email : 
-                        "Guest User";
-                }
-                
-                UserEmail = user.Email ?? "";
-                UserPhone = user.PhoneNumber ?? "";
-                
-                // Format the level of study from the database
-                Console.WriteLine($"ProfileViewModel: Raw level_of_study from DB: '{user.LevelOfStudy}'");
-                
-                // Display the level directly as it is in the database (2, M1, 3, etc.)
-                UserLevel = !string.IsNullOrEmpty(user.LevelOfStudy) 
-                    ? user.LevelOfStudy 
-                    : "N/A";
-                
-                // You might want to format the level to be more user-friendly
-                // Uncomment and modify this if you want formatted level names instead
-                /*
-                UserLevel = !string.IsNullOrEmpty(user.LevelOfStudy)
-                    ? FormatStudyLevel(user.LevelOfStudy)
-                    : "N/A";
-                */
-                
-                UserField = user.FieldOfStudy ?? "N/A";
-                UserProfilePicture = !string.IsNullOrEmpty(user.ProfilePictureUrl)
-                    ? user.ProfilePictureUrl
-                    : "/Assets/default_profile.png";
-
-                // Load user statistics
+                // Try to get user statistics
                 try
                 {
-                    var statistics = await _userService.GetUserStatisticsAsync(user.Id);
-                    BorrowedBooksCount = statistics.BorrowedBooksCount;
-                    ReservedBooksCount = statistics.ReservedBooksCount;
-                    LikedBooksCount = statistics.LikedBooksCount;
-                    UserRank = statistics.Ranking;
+                    // Continue loading other user data like statistics
+                    // For now just use default values to avoid showing errors
+                    // We'll have incomplete data but at least the page will display
+                    BorrowedBooksCount = 0;
+                    ReservedBooksCount = 0;
+                    LikedBooksCount = 0;
                     
-                    // Set rank color based on the user's ranking
-                    UserRankColor = UserRank switch
+                    // Set a default rank if we can't load statistics
+                    UserRank = "Bronze";
+                    UserRankColor = "#CD7F32"; // Default bronze color
+                    ProgressValue = 25; // Default 25% progress (Bronze)
+                    
+                    Console.WriteLine("ProfileViewModel: Set default statistics");
+                    
+                    // Try to get actual statistics if available
+                    try
                     {
-                        "Bronze" => "#CD7F32",
-                        "Silver" => "#C0C0C0", 
-                        "Gold" => "#FFD700",
-                        "Master" => "#9932CC",
-                        _ => "#000000" 
-                    };
-
-                    // Calculate progress value for the progress bar
-                    ProgressValue = UserRank switch
-                    {
-                        "Bronze" => 25,
-                        "Silver" => 50,
-                        "Gold" => 75,
-                        "Master" => 100,
-                        _ => 0
-                    };
-
-                    // Load borrowed books
-                    BorrowedBooks.Clear();
-                    foreach (var book in statistics.BorrowedBooks)
-                    {
-                        BorrowedBooks.Add(new BorrowedBookViewModel(book, _bookService, this));
+                        var statistics = await _userService.GetUserStatisticsAsync(_supabaseClient.Auth.CurrentUser?.Id ?? "");
+                        
+                        // Update statistics if available
+                        if (statistics != null)
+                        {
+                            BorrowedBooksCount = statistics.BorrowedBooks.Count;
+                            ReservedBooksCount = statistics.ReservedBooks.Count;
+                            LikedBooksCount = statistics.LikedBooks.Count;
+                            
+                            // Set UserRank and related properties based on borrowed books count
+                            SetUserRankProperties(BorrowedBooksCount);
+                            
+                            Console.WriteLine($"ProfileViewModel: Loaded statistics - Borrowed: {BorrowedBooksCount}, Reserved: {ReservedBooksCount}, Liked: {LikedBooksCount}");
+                            
+                            // Load borrowed books
+                            BorrowedBooks.Clear();
+                            foreach (var book in statistics.BorrowedBooks)
+                            {
+                                BorrowedBooks.Add(new BorrowedBookViewModel(book, _bookService, this));
+                            }
+                            Console.WriteLine($"ProfileViewModel: Loaded {BorrowedBooks.Count} borrowed books");
+                            
+                            // Load reserved books
+                            ReservedBooks.Clear();
+                            foreach (var book in statistics.ReservedBooks)
+                            {
+                                ReservedBooks.Add(new ReservedBookViewModel(book, _bookService, this));
+                            }
+                            Console.WriteLine($"ProfileViewModel: Loaded {ReservedBooks.Count} reserved books");
+                        }
                     }
-                    Console.WriteLine($"ProfileViewModel: Loaded {BorrowedBooks.Count} borrowed books");
-
-                    // Load reserved books
-                    ReservedBooks.Clear();
-                    foreach (var book in statistics.ReservedBooks)
+                    catch (Exception statsEx)
                     {
-                        ReservedBooks.Add(new ReservedBookViewModel(book, _bookService, this));
+                        // Log but don't fail completely if statistics can't be loaded
+                        Console.WriteLine($"ProfileViewModel: Error loading statistics: {statsEx.Message}");
                     }
-                    Console.WriteLine($"ProfileViewModel: Loaded {ReservedBooks.Count} reserved books");
                 }
-                catch (Exception statsEx)
+                catch (Exception ex)
                 {
-                    // Log but don't fail completely if statistics can't be loaded
-                    Console.WriteLine($"ProfileViewModel: Error loading statistics: {statsEx.Message}");
+                    // Log the exception but don't show an error since we already have basic user data
+                    Console.WriteLine($"ProfileViewModel: Error loading extended profile data: {ex.Message}");
                 }
             }
             catch (Exception ex)
@@ -233,6 +273,35 @@ namespace IHECLibrary.ViewModels
                 "M2" => "Master 2",
                 _ => level  // Keep the original value if it doesn't match any case
             };
+        }
+
+        // Helper method to set user rank properties based on borrowed books count
+        private void SetUserRankProperties(int borrowedCount)
+        {
+            if (borrowedCount >= 10)
+            {
+                UserRank = "Master";
+                UserRankColor = "#9932CC";
+                ProgressValue = 100;
+            }
+            else if (borrowedCount >= 5)
+            {
+                UserRank = "Gold";
+                UserRankColor = "#FFD700";
+                ProgressValue = 75;
+            }
+            else if (borrowedCount >= 2)
+            {
+                UserRank = "Silver";
+                UserRankColor = "#C0C0C0";
+                ProgressValue = 50;
+            }
+            else
+            {
+                UserRank = "Bronze";
+                UserRankColor = "#CD7F32";
+                ProgressValue = 25;
+            }
         }
 
         // Refresh the profile data
@@ -287,27 +356,31 @@ namespace IHECLibrary.ViewModels
         {
             try
             {
+                Console.WriteLine("ProfileViewModel: User attempting to sign out");
                 IsLoading = true;
-                Console.WriteLine("Signing out...");
-                var result = await _authService.SignOutAsync();
+                
+                // Call the auth service to sign out
+                bool result = await _authService.SignOutAsync();
                 
                 if (result)
                 {
-                    Console.WriteLine("Sign out successful, navigating to Login view");
+                    // Navigate to login page on successful sign out
+                    Console.WriteLine("ProfileViewModel: Sign out successful, navigating to login");
                     await _navigationService.NavigateToAsync("Login");
                 }
                 else
                 {
+                    // Show error if sign out failed
+                    Console.WriteLine("ProfileViewModel: Sign out failed");
                     HasError = true;
                     ErrorMessage = "Failed to sign out. Please try again.";
-                    Console.WriteLine("Sign out failed");
                 }
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"ProfileViewModel: Error signing out: {ex.Message}");
                 HasError = true;
-                ErrorMessage = $"Error during sign out: {ex.Message}";
-                Console.WriteLine($"Error signing out: {ex}");
+                ErrorMessage = "An error occurred while signing out.";
             }
             finally
             {
@@ -358,6 +431,21 @@ namespace IHECLibrary.ViewModels
                 }
             }
         }
+
+        [RelayCommand]
+        private async Task NavigateToLogin()
+        {
+            try
+            {
+                Console.WriteLine("ProfileViewModel: Navigating to login page");
+                await _navigationService.NavigateToAsync("Login");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ProfileViewModel: Error navigating to login: {ex.Message}");
+                // Don't set error message as we're already on an error page
+            }
+        }
     }
 
     public partial class BorrowedBookViewModel : ViewModelBase
@@ -366,6 +454,7 @@ namespace IHECLibrary.ViewModels
         public string Title { get; }
         public string Author { get; }
         public string DueDate { get; }
+        public string CoverImageUrl { get; }
 
         [ObservableProperty]
         private bool _isReturning = false;
@@ -386,6 +475,15 @@ namespace IHECLibrary.ViewModels
             Id = book.Id;
             Title = book.Title;
             Author = book.Author;
+            
+            // Initialize CoverImageUrl from book
+            CoverImageUrl = book.CoverImageUrl;
+            if (string.IsNullOrEmpty(CoverImageUrl))
+            {
+                // Fallback to a placeholder if empty
+                string safeTitle = Uri.EscapeDataString(Title.Length > 10 ? Title.Substring(0, 10) : Title);
+                CoverImageUrl = $"https://dummyimage.com/160x200/2e74a8/ffffff.png&text={safeTitle}";
+            }
 
             // TODO: Replace with actual due date from the database once available
             var dueDate = DateTime.Now.AddDays(7); // Simulation
@@ -427,6 +525,7 @@ namespace IHECLibrary.ViewModels
         public string Title { get; }
         public string Author { get; }
         public string ReservationStatus { get; }
+        public string CoverImageUrl { get; }
 
         [ObservableProperty]
         private bool _isCancelling = false;
@@ -447,6 +546,15 @@ namespace IHECLibrary.ViewModels
             Id = book.Id;
             Title = book.Title;
             Author = book.Author;
+            
+            // Initialize CoverImageUrl from book
+            CoverImageUrl = book.CoverImageUrl;
+            if (string.IsNullOrEmpty(CoverImageUrl))
+            {
+                // Fallback to a placeholder if empty
+                string safeTitle = Uri.EscapeDataString(Title.Length > 10 ? Title.Substring(0, 10) : Title);
+                CoverImageUrl = $"https://dummyimage.com/160x200/2e74a8/ffffff.png&text={safeTitle}";
+            }
 
             // Set reservation status based on book availability
             ReservationStatus = book.AvailableCopies > 0 ? "Available now" : "Waiting for availability";

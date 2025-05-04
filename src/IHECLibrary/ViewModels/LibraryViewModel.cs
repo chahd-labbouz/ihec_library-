@@ -123,24 +123,44 @@ namespace IHECLibrary.ViewModels
             IsLoading = true;
             try
             {
-                Console.WriteLine($"Loading books for page {CurrentPage}, pageSize: {PAGE_SIZE}");
+                Console.WriteLine($"LibraryViewModel: Loading books for page {CurrentPage}, pageSize: {PAGE_SIZE}");
                 
                 List<BookModel> books = new List<BookModel>();
                 string? categoryFilter = null;
                 string? searchFilter = null;
 
-                // Si des filtres initiaux sont fournis, les appliquer
+                // Apply initial filters if provided
                 if (_initialFilters != null && !string.IsNullOrEmpty(_initialFilters.SearchQuery))
                 {
                     SearchQuery = _initialFilters.SearchQuery;
                     searchFilter = SearchQuery;
                     PageTitle = $"Search Results: {SearchQuery}";
-                    Console.WriteLine($"Applying search filter: {searchFilter}");
+                    Console.WriteLine($"Applying initial search filter: {searchFilter}");
                 }
                 else if (_initialFilters != null && !string.IsNullOrEmpty(_initialFilters.Category))
                 {
                     categoryFilter = _initialFilters.Category;
+                    PageTitle = $"{categoryFilter} Books";
                     Console.WriteLine($"Applying initial category filter: {categoryFilter}");
+                    
+                    // Make sure the category is selected in UI
+                    var categoryVM = Categories.FirstOrDefault(c => c.Name == categoryFilter);
+                    if (categoryVM != null)
+                    {
+                        // Reset all categories
+                        foreach (var cat in Categories)
+                        {
+                            cat.IsSelected = false;
+                        }
+                        categoryVM.IsSelected = true;
+                    }
+                }
+                // Determine filters from UI selections
+                else if (!string.IsNullOrEmpty(SearchQuery))
+                {
+                    searchFilter = SearchQuery;
+                    PageTitle = $"Search Results: {SearchQuery}";
+                    Console.WriteLine($"Applying search filter from UI: {searchFilter}");
                 }
                 else
                 {
@@ -149,107 +169,129 @@ namespace IHECLibrary.ViewModels
                     if (selectedCategories.Count > 0)
                     {
                         categoryFilter = selectedCategories.First(); // Use first category for the filter
-                        Console.WriteLine($"Applying selected category filter: {categoryFilter}");
+                        PageTitle = $"{categoryFilter} Books";
+                        Console.WriteLine($"Applying category filter from UI: {categoryFilter}");
+                    }
+                    else
+                    {
+                        PageTitle = "All Books";
+                        Console.WriteLine("No filters applied, showing all books");
                     }
                 }
 
-                // Always get books even without filters
-                try 
+                // First try to load all books to ensure we have something to display
+                Console.WriteLine("Loading all books first to ensure we have data to show");
+                books = await _bookService.GetRealBooksAsync(
+                    page: 1, 
+                    pageSize: 50, // Get more books to have enough data
+                    category: null,
+                    searchQuery: null
+                );
+                
+                Console.WriteLine($"Loaded {books.Count} total books");
+                
+                // Then apply filters locally if we have books and filters
+                if (books.Count > 0)
                 {
-                    // Use the GetRealBooksAsync method to fetch books with pagination
-                    books = await _bookService.GetRealBooksAsync(
-                        page: CurrentPage,
-                        pageSize: PAGE_SIZE,
-                        category: categoryFilter,
-                        searchQuery: searchFilter
-                    );
-                    
-                    Console.WriteLine($"Retrieved {books.Count} books from service");
-                    
-                    // If no books from GetRealBooksAsync, fall back to older methods
-                    if (books.Count == 0)
+                    if (!string.IsNullOrEmpty(categoryFilter))
                     {
-                        Console.WriteLine("No books found with GetRealBooksAsync, trying fallbacks");
+                        var filteredBooks = books.Where(b => 
+                            !string.IsNullOrEmpty(b.Category) && 
+                            b.Category.Equals(categoryFilter, StringComparison.OrdinalIgnoreCase)
+                        ).ToList();
                         
-                        if (!string.IsNullOrEmpty(searchFilter))
+                        if (filteredBooks.Count > 0)
                         {
-                            books = await _bookService.GetBooksBySearchAsync(searchFilter);
-                            Console.WriteLine($"Search fallback returned {books.Count} books");
-                        }
-                        else if (!string.IsNullOrEmpty(categoryFilter))
-                        {
-                            books = await _bookService.GetBooksByCategoryAsync(categoryFilter);
-                            Console.WriteLine($"Category fallback returned {books.Count} books");
+                            books = filteredBooks;
+                            Console.WriteLine($"Applied category filter, now have {books.Count} books");
                         }
                         else
                         {
-                            // Use the recommended books if no specific filters are applied
-                            books = await _bookService.GetRecommendedBooksAsync();
-                            Console.WriteLine($"Recommendations fallback returned {books.Count} books");
-                            
-                            // If still no books, try to get all books with filters
-                            if (books.Count == 0)
-                            {
-                                var allCategories = Categories.Select(c => c.Name).ToList();
-                                books = await _bookService.GetBooksByFiltersAsync(allCategories, false, null);
-                                Console.WriteLine($"All categories fallback returned {books.Count} books");
-                            }
+                            Console.WriteLine($"No books match category '{categoryFilter}', showing all books");
+                        }
+                    }
+                    
+                    if (!string.IsNullOrEmpty(searchFilter))
+                    {
+                        var filteredBooks = books.Where(b => 
+                            (!string.IsNullOrEmpty(b.Title) && b.Title.Contains(searchFilter, StringComparison.OrdinalIgnoreCase)) ||
+                            (!string.IsNullOrEmpty(b.Author) && b.Author.Contains(searchFilter, StringComparison.OrdinalIgnoreCase)) ||
+                            (!string.IsNullOrEmpty(b.Description) && b.Description.Contains(searchFilter, StringComparison.OrdinalIgnoreCase))
+                        ).ToList();
+                        
+                        if (filteredBooks.Count > 0)
+                        {
+                            books = filteredBooks;
+                            Console.WriteLine($"Applied search filter, now have {books.Count} books");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"No books match search '{searchFilter}', showing all books");
                         }
                     }
                 }
-                catch (Exception ex) 
-                {
-                    Console.WriteLine($"Error getting books: {ex.Message}");
-                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                    books = new List<BookModel>();
-                }
-
-                // Apply additional filtering if needed
-                if (IsAvailableOnly)
-                {
-                    var filteredCount = books.Count;
-                    books = books.Where(b => b.AvailableCopies > 0).ToList();
-                    Console.WriteLine($"Available only filter: {filteredCount} -> {books.Count} books");
-                }
-
-                // Apply language filtering
-                var selectedLanguage = Languages.FirstOrDefault(l => l.IsSelected)?.Name;
-                if (!string.IsNullOrEmpty(selectedLanguage))
-                {
-                    var filteredCount = books.Count;
-                    books = books.Where(b => 
-                        string.IsNullOrEmpty(b.Language) || 
-                        b.Language.Equals(selectedLanguage, StringComparison.OrdinalIgnoreCase)
-                    ).ToList();
-                    Console.WriteLine($"Language filter '{selectedLanguage}': {filteredCount} -> {books.Count} books");
-                }
-
-                // Calculate pagination info - assuming we get page size items per request
-                // Adjust total pages dynamically based on results
-                int estimatedTotalBooks = books.Count == PAGE_SIZE ? PAGE_SIZE * 10 : books.Count; // Estimate if we got a full page
-                TotalPages = Math.Max(1, (int)Math.Ceiling(estimatedTotalBooks / (double)PAGE_SIZE));
-                HasNextPage = books.Count == PAGE_SIZE; // If we got a full page, assume there are more
-                HasPreviousPage = CurrentPage > 1;
                 
-                Console.WriteLine($"Pagination: Page {CurrentPage}/{TotalPages}, HasNext: {HasNextPage}, HasPrevious: {HasPreviousPage}");
-
+                // Apply availability filter if needed
+                if (IsAvailableOnly && books.Count > 0)
+                {
+                    var originalCount = books.Count;
+                    books = books.Where(b => b.IsAvailable()).ToList();
+                    Console.WriteLine($"Applied availability filter: {originalCount} -> {books.Count} books");
+                }
+                
                 // Apply sorting
                 books = SortBooks(books);
-
-                // Update the book collection
+                Console.WriteLine("Applied sorting");
+                
+                // Update pagination info
+                TotalPages = Math.Max(1, (int)Math.Ceiling(books.Count / (double)PAGE_SIZE));
+                HasNextPage = CurrentPage < TotalPages;
+                HasPreviousPage = CurrentPage > 1;
+                
+                // Apply pagination
+                var pagedBooks = books
+                    .Skip((CurrentPage - 1) * PAGE_SIZE)
+                    .Take(PAGE_SIZE)
+                    .ToList();
+                
+                Console.WriteLine($"After pagination: {pagedBooks.Count} books for display");
+                
+                // Update the UI with books
                 Books.Clear();
-                foreach (var book in books)
+                
+                foreach (var book in pagedBooks)
                 {
-                    Books.Add(new BookViewModel(book, _bookService));
+                    try
+                    {
+                        // Create a debug copy of the book in case of errors
+                        Console.WriteLine($"Processing book: ID={book.Id}, Title={book.Title}, Author={book.Author}, Category={book.Category}");
+                        var bookViewModel = new BookViewModel(book, _bookService);
+                        Books.Add(bookViewModel);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error creating BookViewModel: {ex.Message}");
+                    }
                 }
                 
-                Console.WriteLine($"Added {Books.Count} books to the UI collection");
+                Console.WriteLine($"LibraryViewModel: Added {Books.Count} books to UI");
+                
+                // If still no books, show message or take other action
+                if (Books.Count == 0)
+                {
+                    Console.WriteLine("WARNING: No books to display after all attempts");
+                    PageTitle = "No Books Found";
+                }
+                
+                // Reset initial filters after first load to prevent them from being reapplied
+                _initialFilters = null;
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
-                Console.WriteLine($"Error in LoadBooks: {ex.Message}");
+                Console.WriteLine($"Error loading books: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                // You might want to add error handling UI here
+                PageTitle = "Error Loading Books";
+                Books.Clear();
             }
             finally
             {

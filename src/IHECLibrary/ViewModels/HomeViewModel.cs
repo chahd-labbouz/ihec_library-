@@ -56,11 +56,56 @@ namespace IHECLibrary.ViewModels
 
         private async void LoadRecommendedBooks()
         {
-            var books = await _bookService.GetRecommendedBooksAsync();
-            RecommendedBooks.Clear();
-            foreach (var book in books)
+            try
             {
-                RecommendedBooks.Add(new BookViewModel(book, _bookService));
+                Console.WriteLine("HomeViewModel: Loading recommended books...");
+                var books = await _bookService.GetRecommendedBooksAsync();
+                
+                Console.WriteLine($"HomeViewModel: Received {books.Count} books from service");
+                
+                // Clear existing books
+                RecommendedBooks.Clear();
+                
+                if (books.Count == 0)
+                {
+                    Console.WriteLine("WARNING: No books returned from GetRecommendedBooksAsync");
+                    
+                    // Try loading all books instead
+                    books = await _bookService.GetRealBooksAsync(1, 10);
+                    Console.WriteLine($"Fallback to GetRealBooksAsync returned {books.Count} books");
+                    
+                    if (books.Count == 0)
+                    {
+                        // No books found, update UI message
+                        RecommendationSubtitle = "No books found in the library. Please contact an administrator.";
+                        return;
+                    }
+                }
+                
+                // Add books to the view model collection
+                foreach (var book in books)
+                {
+                    try
+                    {
+                        Console.WriteLine($"Adding book to UI: {book.Title}");
+                        var bookViewModel = new BookViewModel(book, _bookService);
+                        RecommendedBooks.Add(bookViewModel);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error adding book to UI: {ex.Message}");
+                    }
+                }
+                
+                Console.WriteLine($"HomeViewModel: Added {RecommendedBooks.Count} books to UI");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in LoadRecommendedBooks: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                
+                // Update UI with error message
+                RecommendationSubtitle = "Unable to load books. Please try again later.";
             }
         }
 

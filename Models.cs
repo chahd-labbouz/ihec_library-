@@ -19,6 +19,14 @@ namespace IHECLibrary
         public int TotalCopies { get; set; }
         public int LikesCount { get; set; }
         public string Language { get; set; } = string.Empty;
+        public decimal RatingAverage { get; set; }
+        public bool IsLikedByCurrentUser { get; set; }
+        
+        // Method to check if book is available
+        public bool IsAvailable()
+        {
+            return AvailableCopies > 0;
+        }
     }
 
     // Modèles pour les utilisateurs

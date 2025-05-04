@@ -68,50 +68,74 @@ namespace IHECLibrary.ViewModels
             colorIndex = DateTime.Now.Second % CardColors.Length;
         }
 
-        public BookViewModel(BookModel book, IBookService bookService, INavigationService? navigationService = null)
-        {
-            _bookService = bookService;
-            _navigationService = navigationService;
-            
-            Id = book.Id;
-            Title = book.Title;
-            Author = book.Author;
-            Category = book.Category;
-            
-            // Improved placeholder image handling - more resilient
-            if (!string.IsNullOrEmpty(book.CoverImageUrl) && Uri.IsWellFormedUriString(book.CoverImageUrl, UriKind.Absolute))
-            {
-                CoverImageUrl = book.CoverImageUrl;
-            }
-            else
-            {
-                // Use a more reliable placeholder service with book title encoded properly
-                string encodedTitle = Uri.EscapeDataString(book.Title?.Length > 20 ? book.Title.Substring(0, 20) : (book.Title ?? "Book"));
-                CoverImageUrl = $"https://placehold.co/200x300/e8e8e8/4a4a4a?text={encodedTitle}";
-            }
-            
-            // Set availability status and properties
-            IsAvailable = book.IsAvailable();
-            AvailabilityStatus = IsAvailable ? "Available" : "Unavailable";
-            AvailabilityColor = IsAvailable ? "#4CAF50" : "#F44336"; // Green for available, red for unavailable
-            
-            // Assign a background color from our rotation - CRITICAL for UI display
-            CardColor = CardColors[colorIndex];
-            colorIndex = (colorIndex + 1) % CardColors.Length;
-            
-            IsLiked = book.IsLikedByCurrentUser;
+        // Make services nullable to avoid warning CS8618
+        private readonly IBookService? _bookService;
+        private readonly INavigationService? _navigationService;
 
-            // Set action button properties based on availability
-            ActionButtonText = IsAvailable ? "Borrow" : "Reserve";
-            ActionButtonBackground = IsAvailable ? "#2E74A8" : "#9E9E9E"; 
-            
-            Console.WriteLine($"Created BookViewModel: {Title}, IsAvailable: {IsAvailable}, CardColor: {CardColor}");
+        public BookViewModel(BookModel book, IBookService? bookService = null, INavigationService? navigationService = null)
+        {
+            try
+            {
+                Console.WriteLine($"Creating BookViewModel for book: {book.Title}");
+                _bookService = bookService;
+                _navigationService = navigationService;
+                
+                Id = book.Id;
+                Title = string.IsNullOrWhiteSpace(book.Title) ? "Untitled Book" : book.Title;
+                Author = string.IsNullOrWhiteSpace(book.Author) ? "Unknown Author" : book.Author;
+                Category = string.IsNullOrWhiteSpace(book.Category) ? "General" : book.Category;
+                
+                // Set cover image
+                if (!string.IsNullOrEmpty(book.CoverImageUrl) && Uri.IsWellFormedUriString(book.CoverImageUrl, UriKind.Absolute))
+                {
+                    CoverImageUrl = book.CoverImageUrl;
+                    Console.WriteLine($"Using book cover URL: {CoverImageUrl}");
+                }
+                else
+                {
+                    // Use a more reliable placeholder service with book title encoded properly
+                    string safeTitle = Uri.EscapeDataString(Title.Length > 10 ? Title.Substring(0, 10) : Title);
+                    // Using dummyimage.com which is very reliable
+                    CoverImageUrl = $"https://dummyimage.com/160x200/2e74a8/ffffff.png&text={safeTitle}";
+                    Console.WriteLine($"Using placeholder cover: {CoverImageUrl}");
+                }
+                
+                // Set availability status
+                IsAvailable = book.IsAvailable();
+                AvailabilityStatus = IsAvailable ? "Available" : "Unavailable";
+                AvailabilityColor = IsAvailable ? "#4CAF50" : "#F44336"; // Green for available, red for unavailable
+                
+                // Assign a background color from our rotation
+                CardColor = CardColors[colorIndex];
+                colorIndex = (colorIndex + 1) % CardColors.Length;
+                
+                IsLiked = book.IsLikedByCurrentUser;
+
+                // Set action button properties based on availability
+                ActionButtonText = IsAvailable ? "Borrow" : "Reserve";
+                ActionButtonBackground = IsAvailable ? "#2E74A8" : "#9E9E9E"; 
+                
+                Console.WriteLine($"BookViewModel created successfully: {Title}, IsAvailable: {IsAvailable}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating BookViewModel: {ex.Message}");
+                
+                // Set default values to prevent UI errors
+                Title = "Book";
+                Author = "Author";
+                Category = "General";
+                CoverImageUrl = "https://placehold.co/200x300/2e74a8/ffffff?text=Book";
+                IsAvailable = true;
+                AvailabilityStatus = "Available";
+                AvailabilityColor = "#4CAF50";
+                CardColor = CardColors[0];
+                ActionButtonText = "View";
+                ActionButtonBackground = "#2E74A8";
+            }
         }
 
         public ICommand ActionCommand => ViewDetailsCommand;
-
-        private readonly IBookService _bookService;
-        private readonly INavigationService? _navigationService;
 
         [RelayCommand]
         private void ViewDetails()
@@ -130,6 +154,12 @@ namespace IHECLibrary.ViewModels
         [RelayCommand]
         private async Task ToggleLike()
         {
+            if (_bookService == null)
+            {
+                Console.WriteLine("Cannot toggle like: BookService is null");
+                return;
+            }
+            
             try
             {
                 bool wasLiked = IsLiked;

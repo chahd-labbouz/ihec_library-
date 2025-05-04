@@ -14,66 +14,75 @@
     </Grid.RowDefinitions>
     
     <!-- Barre de navigation -->
-    <Grid Grid.Row="0" Background="White" Height="70">
+    <Grid Grid.Row="0" Background="{StaticResource PrimaryBrush}" Height="60">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="*"/>
         <ColumnDefinition Width="Auto"/>
       </Grid.ColumnDefinitions>
       
-      <!-- Logo et titre -->
+      <!-- Logo and title -->
       <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
-        <TextBlock Text="IHEC Library" FontSize="24" FontWeight="Bold" Foreground="#2E74A8"/>
+        <TextBlock Text="📚" FontSize="22" Margin="0,0,8,0" Foreground="White"/>
+        <TextBlock Text="IHEC BookZone" FontSize="22" FontWeight="SemiBold" Foreground="White"/>
       </StackPanel>
       
-      <!-- Menu de navigation -->
+      <!-- Center navigation menu -->
       <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
         <Button Content="Home" Command="{Binding NavigateToHomeCommand}" 
-                Background="Transparent" Foreground="#2E74A8" 
-                Padding="15,10" Margin="5,0" CornerRadius="20"/>
+                Background="Transparent" Foreground="White" 
+                Padding="12,8" Margin="5,0" CornerRadius="4"/>
         <Button Content="Library" Command="{Binding NavigateToLibraryCommand}" 
-                Background="Transparent" Foreground="#2E74A8" 
-                Padding="15,10" Margin="5,0" CornerRadius="20"/>
-        <Button Content="HEC 1.0" Command="{Binding NavigateToChatbotCommand}" 
-                Background="Transparent" Foreground="#2E74A8" 
-                Padding="15,10" Margin="5,0" CornerRadius="20"/>
+                Background="Transparent" Foreground="White" 
+                Padding="12,8" Margin="5,0" CornerRadius="4"/>
         <Button Content="Profile" Command="{Binding NavigateToProfileCommand}" 
-                Background="#E6F2F8" Foreground="#2E74A8" 
-                Padding="15,10" Margin="5,0" CornerRadius="20"/>
+                Background="White" Foreground="{StaticResource PrimaryBrush}" 
+                Padding="12,8" Margin="5,0" CornerRadius="4"/>
+        <Button Content="Contact" 
+                Background="Transparent" Foreground="White" 
+                Padding="12,8" Margin="5,0" CornerRadius="4"/>
       </StackPanel>
       
-      <!-- Recherche et profil -->
+      <!-- Right side: Search and profile -->
       <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
-        <Border CornerRadius="15" Padding="10,7,10,7" Background="#F0F2F5" Margin="0,0,10,0">
-          <TextBox Text="{Binding SearchQuery}" Watermark="Search books..." Width="200" 
-                 BorderThickness="0" Background="Transparent"/>
+        <Button Content="Ask" Padding="12,5" Margin="0,0,15,0" 
+                Background="Transparent" Foreground="White" 
+                BorderBrush="White" BorderThickness="1" CornerRadius="4"/>
+        <Border CornerRadius="50" Width="32" Height="32" ClipToBounds="True" 
+                Margin="0,0,8,0" Background="#F0F2F5">
+          <Image Source="{Binding UserProfilePicture}" Stretch="UniformToFill"/>
         </Border>
-        <Grid Margin="5,0,0,0">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-          </Grid.ColumnDefinitions>
-          
-          <Border Grid.Column="0" CornerRadius="50" Width="32" Height="32" ClipToBounds="True" 
-                  Margin="0,0,8,0" Background="#F0F2F5">
-            <Image Source="{Binding UserProfilePicture}" Stretch="UniformToFill"/>
-          </Border>
-          <TextBlock Grid.Column="1" Text="{Binding UserFullName}" VerticalAlignment="Center" 
-                     FontSize="13" FontWeight="SemiBold"/>
-        </Grid>
       </StackPanel>
     </Grid>
     
     <!-- Contenu principal -->
     <Grid Grid.Row="1">
-      <!-- Error message display -->
-      <Border Background="#FFEBEE" Padding="20" IsVisible="{Binding HasError}" Margin="20">
+      <!-- Error message display with updated styling -->
+      <Border Background="#FFF3F3" Padding="20" IsVisible="{Binding HasError}" Margin="20" CornerRadius="8" BorderBrush="#FFCDD2" BorderThickness="1">
         <StackPanel>
-          <TextBlock Text="An error occurred" FontSize="20" FontWeight="Bold" Margin="0,0,0,10" Foreground="#D32F2F"/>
-          <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" Foreground="#D32F2F"/>
-          <Button Content="Retry" Command="{Binding RefreshProfileCommand}" 
-                  Background="#2E74A8" Foreground="White" 
-                  Padding="15,10" Margin="0,20,0,0" CornerRadius="4"/>
+          <TextBlock Text="Une erreur est survenue" FontSize="20" FontWeight="Bold" Margin="0,0,0,10" Foreground="#D32F2F"/>
+          <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" Foreground="#D32F2F" Margin="0,0,0,15"/>
+          
+          <!-- Description of possible solutions -->
+          <TextBlock Text="Voici quelques solutions à essayer:" Foreground="#555555" Margin="0,0,0,10"/>
+          
+          <!-- Action buttons with class styling -->
+          <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <Button Content="Réessayer" Command="{Binding RefreshProfileCommand}" 
+                    Classes="primary" 
+                    Padding="15,8" Margin="0,0,10,0"/>
+            
+            <Button Content="Connexion" Command="{Binding NavigateToLoginCommand}" 
+                    Classes="secondary" 
+                    Padding="15,8" Margin="10,0,10,0"/>
+            
+            <Button Content="Accueil" Command="{Binding NavigateToHomeCommand}" 
+                    Classes="accent" 
+                    Padding="15,8" Margin="10,0,0,0"/>
+          </StackPanel>
+          
+          <TextBlock Text="Si le problème persiste, veuillez contacter le support ou redémarrer l'application." 
+                     Foreground="#555555" TextWrapping="Wrap" FontSize="12"/>
         </StackPanel>
       </Border>
       
@@ -81,62 +90,90 @@
       <Border Background="#80FFFFFF" IsVisible="{Binding IsLoading}" ZIndex="100">
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
           <ProgressBar IsIndeterminate="True" Width="100" Height="4" Margin="0,0,0,10"/>
-          <TextBlock Text="Loading profile..." FontSize="14" HorizontalAlignment="Center"/>
+          <TextBlock Text="Chargement du profil..." FontSize="14" HorizontalAlignment="Center"/>
         </StackPanel>
       </Border>
       
       <!-- Main content when not loading and no errors -->
-      <ScrollViewer Padding="20" Background="#eff4ff" IsVisible="{Binding !HasError}">
+      <ScrollViewer Padding="40" Background="White" IsVisible="{Binding !HasError}">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300"/>
             <ColumnDefinition Width="*"/>
           </Grid.ColumnDefinitions>
           
-          <!-- Profil utilisateur -->
-          <StackPanel Grid.Column="0" Margin="0,0,20,0">
-            <Border CornerRadius="100" Width="150" Height="150" ClipToBounds="True" HorizontalAlignment="Center" Margin="0,0,0,20">
-              <Image Source="{Binding UserProfilePicture}" Stretch="UniformToFill"/>
+          <!-- User profile section -->
+          <StackPanel Grid.Column="0" Margin="0,0,40,0">
+            <Border Classes="card" Padding="20">
+              <StackPanel>
+                <Border CornerRadius="100" Width="150" Height="150" ClipToBounds="True" HorizontalAlignment="Center" Margin="0,0,0,20">
+                  <Image Source="{Binding UserProfilePicture}" Stretch="UniformToFill"/>
+                </Border>
+                
+                <TextBlock Text="{Binding UserFullName}" FontSize="22" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="{StaticResource PrimaryBrush}"/>
+                <TextBlock Text="{Binding UserEmail}" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,20" Opacity="0.7"/>
+                
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,0,0,20">
+                  <TextBlock Grid.Row="0" Grid.Column="0" Text="Téléphone:" FontWeight="SemiBold" Margin="0,0,10,10"/>
+                  <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding UserPhone}" Margin="0,0,0,10"/>
+                  
+                  <TextBlock Grid.Row="1" Grid.Column="0" Text="Niveau:" FontWeight="SemiBold" Margin="0,0,10,10"/>
+                  <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding UserLevel}" Margin="0,0,0,10"/>
+                  
+                  <TextBlock Grid.Row="2" Grid.Column="0" Text="Domaine:" FontWeight="SemiBold" Margin="0,0,10,10"/>
+                  <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding UserField}" Margin="0,0,0,10"/>
+                  
+                  <TextBlock Grid.Row="3" Grid.Column="0" Text="Rang:" FontWeight="SemiBold" Margin="0,0,10,10"/>
+                  <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding UserRank}" FontWeight="Bold" Margin="0,0,0,10" Foreground="{StaticResource PrimaryBrush}"/>
+                </Grid>
+                
+                <Button Content="Modifier le profil" Command="{Binding EditProfileCommand}" 
+                        Classes="primary" 
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                        Height="40" Margin="0,0,0,10"/>
+                
+                <Button Content="Déconnexion" Command="{Binding SignOutCommand}" 
+                        Classes="secondary" 
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                        Height="40"/>
+              </StackPanel>
             </Border>
-            
-            <TextBlock Text="{Binding UserFullName}" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#2e74a8"/>
-            <TextBlock Text="{Binding UserEmail}" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="#2e74a8"/>
-            
-            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,0,0,20">
-              <TextBlock Grid.Row="0" Grid.Column="0" Text="Phone:" FontWeight="SemiBold" Margin="0,0,10,5" Foreground="#2e74a8"/>
-              <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding UserPhone}" Margin="0,0,0,5" Foreground="#2e74a8"/>
-              
-              <TextBlock Grid.Row="1" Grid.Column="0" Text="Level:" FontWeight="SemiBold" Margin="0,0,10,5" Foreground="#2e74a8"/>
-              <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding UserLevel}" Margin="0,0,0,5" Foreground="#2e74a8"/>
-              
-              <TextBlock Grid.Row="2" Grid.Column="0" Text="Field:" FontWeight="SemiBold" Margin="0,0,10,5" Foreground="#2e74a8"/>
-              <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding UserField}" Margin="0,0,0,5" Foreground="#2e74a8"/>
-              
-              <TextBlock Grid.Row="3" Grid.Column="0" Text="Rank:" FontWeight="SemiBold" Margin="0,0,10,5" Foreground="#2e74a8"/>
-              <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding UserRank}" Foreground="#2e74a8" FontWeight="Bold" Margin="0,0,0,5"/>
-            </Grid>
-            
-            <Button Content="Edit Profile" Command="{Binding EditProfileCommand}" 
-                    Background="#2E74A8" Foreground="White" 
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                    Height="40" CornerRadius="4" Margin="0,0,0,10"/>
-            
-            <Button Content="Sign Out" Command="{Binding SignOutCommand}" 
-                    Background="#F44336" Foreground="White" 
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                    Height="40" CornerRadius="4"/>
           </StackPanel>
           
-          <!-- Statistiques et activités -->
+          <!-- Statistics and activities -->
           <StackPanel Grid.Column="1">
-            <!-- Système de classement -->
-            <Border Background="#F8F9FA" CornerRadius="8" Padding="20" Margin="0,0,0,20">
+            <!-- Statistics overview -->
+            <Grid ColumnDefinitions="*,*,*" Margin="0,0,0,30">
+              <Border Grid.Column="0" Classes="card" Margin="0,0,10,0" Background="#f0f7fd">
+                <StackPanel>
+                  <TextBlock Text="{Binding BorrowedBooksCount}" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource PrimaryBrush}"/>
+                  <TextBlock Text="Livres empruntés" FontSize="14" HorizontalAlignment="Center"/>
+                </StackPanel>
+              </Border>
+              
+              <Border Grid.Column="1" Classes="card" Margin="10,0,10,0" Background="#f5f5f5">
+                <StackPanel>
+                  <TextBlock Text="{Binding ReservedBooksCount}" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource PrimaryBrush}"/>
+                  <TextBlock Text="Livres réservés" FontSize="14" HorizontalAlignment="Center"/>
+                </StackPanel>
+              </Border>
+              
+              <Border Grid.Column="2" Classes="card" Margin="10,0,0,0" Background="#f0f9f0">
+                <StackPanel>
+                  <TextBlock Text="{Binding LikedBooksCount}" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource PrimaryBrush}"/>
+                  <TextBlock Text="Livres favoris" FontSize="14" HorizontalAlignment="Center"/>
+                </StackPanel>
+              </Border>
+            </Grid>
+            
+            <!-- Ranking system card -->
+            <Border Classes="card" Margin="0,0,0,30">
               <StackPanel>
-                <TextBlock Text="Reader Ranking System" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#2e74a8"/>
-                <TextBlock Text="Progress through ranks by borrowing more books from the library" FontSize="14" Margin="0,0,0,20" Foreground="#2e74a8"/>
+                <TextBlock Text="Système de classement des lecteurs" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="{StaticResource PrimaryBrush}"/>
+                <TextBlock Text="Progressez dans les rangs en empruntant plus de livres à la bibliothèque" FontSize="14" Margin="0,0,0,20" Opacity="0.7"/>
                 
                 <Grid ColumnDefinitions="*,*,*,*">
-                  <!-- Bronze - Vector-based badge instead of image -->
+                  <!-- Bronze rank -->
                   <StackPanel Grid.Column="0" HorizontalAlignment="Center">
                     <Canvas Width="60" Height="60">
                       <Ellipse Canvas.Left="5" Canvas.Top="5" Width="50" Height="50" Fill="#CD7F32" />
@@ -147,10 +184,10 @@
                     <Border Background="#CD7F32" CornerRadius="15" Padding="10,5" Margin="0,10,0,5">
                       <TextBlock Text="Bronze" Foreground="#333333" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="&lt; 2 books" FontSize="12" HorizontalAlignment="Center" Foreground="#333333" FontWeight="SemiBold"/>
+                    <TextBlock Text="&lt; 2 livres" FontSize="12" HorizontalAlignment="Center" Foreground="#333333" FontWeight="SemiBold"/>
                   </StackPanel>
                   
-                  <!-- Silver - Vector-based badge instead of image -->
+                  <!-- Silver rank -->
                   <StackPanel Grid.Column="1" HorizontalAlignment="Center">
                     <Canvas Width="60" Height="60">
                       <Ellipse Canvas.Left="5" Canvas.Top="5" Width="50" Height="50" Fill="#C0C0C0" />
@@ -159,12 +196,12 @@
                             Fill="White" Stroke="#A0A0A0" StrokeThickness="1" />
                     </Canvas>
                     <Border Background="#C0C0C0" CornerRadius="15" Padding="10,5" Margin="0,10,0,5">
-                      <TextBlock Text="Silver" Foreground="#333333" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                      <TextBlock Text="Argent" Foreground="#333333" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="2-4 books" FontSize="12" HorizontalAlignment="Center" Foreground="#333333" FontWeight="SemiBold"/>
+                    <TextBlock Text="2-4 livres" FontSize="12" HorizontalAlignment="Center" Foreground="#333333" FontWeight="SemiBold"/>
                   </StackPanel>
                   
-                  <!-- Gold - Vector-based badge instead of image -->
+                  <!-- Gold rank -->
                   <StackPanel Grid.Column="2" HorizontalAlignment="Center">
                     <Canvas Width="60" Height="60">
                       <Ellipse Canvas.Left="5" Canvas.Top="5" Width="50" Height="50" Fill="#FFD700" />
@@ -173,134 +210,114 @@
                             Fill="White" Stroke="#DAA520" StrokeThickness="1" />
                     </Canvas>
                     <Border Background="#FFD700" CornerRadius="15" Padding="10,5" Margin="0,10,0,5">
-                      <TextBlock Text="Gold" Foreground="#333333" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                      <TextBlock Text="Or" Foreground="#333333" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="5-10 books" FontSize="12" HorizontalAlignment="Center" Foreground="#333333" FontWeight="SemiBold"/>
+                    <TextBlock Text="5-10 livres" FontSize="12" HorizontalAlignment="Center" Foreground="#333333" FontWeight="SemiBold"/>
                   </StackPanel>
                   
-                  <!-- Master - Vector-based badge instead of image -->
+                  <!-- Master rank -->
                   <StackPanel Grid.Column="3" HorizontalAlignment="Center">
                     <Canvas Width="60" Height="60">
-                      <Ellipse Canvas.Left="5" Canvas.Top="5" Width="50" Height="50" Fill="#9932CC" />
+                      <Ellipse Canvas.Left="5" Canvas.Top="5" Width="50" Height="50" Fill="{StaticResource PrimaryBrush}" />
                       <Path Canvas.Left="18" Canvas.Top="15" 
                             Data="M12,2 L15.09,8.45 L22,9.82 L16.91,14.77 L18.27,21.6 L12,18.32 L5.72,21.6 L7.09,14.77 L2,9.82 L8.91,8.45 Z" 
-                            Fill="White" Stroke="#7B2A9D" StrokeThickness="1" />
-                      <Ellipse Canvas.Left="20" Canvas.Top="20" Width="20" Height="20" Fill="#9932CC" Stroke="White" StrokeThickness="1" />
+                            Fill="White" Stroke="#102a70" StrokeThickness="1" />
+                      <Ellipse Canvas.Left="20" Canvas.Top="20" Width="20" Height="20" Fill="{StaticResource PrimaryBrush}" Stroke="White" StrokeThickness="1" />
                     </Canvas>
-                    <Border Background="#9932CC" CornerRadius="15" Padding="10,5" Margin="0,10,0,5">
+                    <Border Background="{StaticResource PrimaryBrush}" CornerRadius="15" Padding="10,5" Margin="0,10,0,5">
                       <TextBlock Text="Master" Foreground="#FFFFFF" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="&gt; 10 books" FontSize="12" HorizontalAlignment="Center" Foreground="#333333" FontWeight="SemiBold"/>
+                    <TextBlock Text="&gt; 10 livres" FontSize="12" HorizontalAlignment="Center" Foreground="#333333" FontWeight="SemiBold"/>
                   </StackPanel>
                 </Grid>
                 
                 <StackPanel Margin="0,20,0,0">
-                  <TextBlock Text="Your Current Progress" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#2e74a8"/>
+                  <TextBlock Text="Votre progression actuelle" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="{StaticResource PrimaryBrush}"/>
                   <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto">
-                    <ProgressBar Grid.Row="0" Grid.ColumnSpan="4" Value="{Binding ProgressValue}" Maximum="100" Height="10" Margin="0,0,0,5"/>
+                    <ProgressBar Grid.Row="0" Grid.ColumnSpan="4" Value="{Binding ProgressValue}" Maximum="100" Height="10" Margin="0,0,0,5" Foreground="{StaticResource PrimaryBrush}"/>
                     
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Bronze" FontSize="12" HorizontalAlignment="Left" Foreground="#2e74a8"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Silver" FontSize="12" HorizontalAlignment="Center" Foreground="#2e74a8"/>
-                    <TextBlock Grid.Row="1" Grid.Column="2" Text="Gold" FontSize="12" HorizontalAlignment="Center" Foreground="#2e74a8"/>
-                    <TextBlock Grid.Row="1" Grid.Column="3" Text="Master" FontSize="12" HorizontalAlignment="Right" Foreground="#2e74a8"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Bronze" FontSize="12" HorizontalAlignment="Left"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Argent" FontSize="12" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Row="1" Grid.Column="2" Text="Or" FontSize="12" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Row="1" Grid.Column="3" Text="Master" FontSize="12" HorizontalAlignment="Right"/>
                   </Grid>
                 </StackPanel>
               </StackPanel>
             </Border>
             
-            <!-- Statistiques -->
-            <Grid ColumnDefinitions="*,*,*" Margin="0,0,0,20">
-              <Border Grid.Column="0" Background="#E6F2F8" CornerRadius="8" Padding="20" Margin="0,0,10,0">
-                <StackPanel>
-                  <TextBlock Text="{Binding BorrowedBooksCount}" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center"/>
-                  <TextBlock Text="Books Borrowed" FontSize="14" HorizontalAlignment="Center"/>
-                </StackPanel>
-              </Border>
-              
-              <Border Grid.Column="1" Background="#E6F0FF" CornerRadius="8" Padding="20" Margin="10,0,10,0">
-                <StackPanel>
-                  <TextBlock Text="{Binding ReservedBooksCount}" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center"/>
-                  <TextBlock Text="Books Reserved" FontSize="14" HorizontalAlignment="Center"/>
-                </StackPanel>
-              </Border>
-              
-              <Border Grid.Column="2" Background="#E6FFE6" CornerRadius="8" Padding="20" Margin="10,0,0,0">
-                <StackPanel>
-                  <TextBlock Text="{Binding LikedBooksCount}" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center"/>
-                  <TextBlock Text="Books of Interest" FontSize="14" HorizontalAlignment="Center"/>
-                </StackPanel>
-              </Border>
-            </Grid>
+            <!-- Borrowed books section -->
+            <Border Classes="card" Margin="0,0,0,30">
+              <StackPanel>
+                <TextBlock Text="Livres actuellement empruntés" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="{StaticResource PrimaryBrush}"/>
+                
+                <ItemsControl ItemsSource="{Binding BorrowedBooks}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:BorrowedBookViewModel">
+                      <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="10,15">
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                          <!-- Book cover -->
+                          <Border Grid.Column="0" Width="50" Height="70" CornerRadius="4" ClipToBounds="True" Margin="0,0,15,0">
+                            <Image Source="{Binding CoverImageUrl}" Stretch="UniformToFill"/>
+                          </Border>
+                          
+                          <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="16"/>
+                            <TextBlock Text="{Binding Author}" FontSize="14" Margin="0,5,0,0" Opacity="0.7"/>
+                            <TextBlock Text="{Binding DueDate}" Foreground="{StaticResource PrimaryBrush}" FontSize="12" Margin="0,5,0,0"/>
+                          </StackPanel>
+                          
+                          <Button Grid.Column="2" Content="Retourner" Command="{Binding ReturnCommand}" 
+                                  Classes="primary" 
+                                  VerticalAlignment="Center" Padding="15,8"/>
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                
+                <!-- Show message when no borrowed books -->
+                <TextBlock Text="Vous n'avez pas de livres empruntés actuellement" 
+                          IsVisible="{Binding !BorrowedBooks.Count}" 
+                          Opacity="0.7" HorizontalAlignment="Center" Margin="0,15,0,0"/>
+              </StackPanel>
+            </Border>
             
-            <!-- Livres empruntés -->
-            <TextBlock Text="Currently Borrowed Books" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10"/>
-            <ItemsControl ItemsSource="{Binding BorrowedBooks}" Margin="0,0,0,20">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="vm:BorrowedBookViewModel">
-                  <Border Background="#F8F9FA" CornerRadius="8" Padding="15" Margin="0,0,0,10">
-                    <Grid ColumnDefinitions="Auto,*,Auto">
-                      <!-- Book icon as vector graphic -->
-                      <Canvas Grid.Column="0" Width="50" Height="50" Margin="0,0,15,0">
-                        <Border Canvas.Left="5" Canvas.Top="5" Width="40" Height="40" 
-                                Background="#2E74A8" CornerRadius="3" />
-                        <Border Canvas.Left="7" Canvas.Top="7" Width="36" Height="36" 
-                                BorderBrush="White" BorderThickness="2" CornerRadius="3" />
-                        <Line StartPoint="12,10" EndPoint="38,10" Stroke="White" StrokeThickness="1" />
-                        <Line StartPoint="12,15" EndPoint="38,15" Stroke="White" StrokeThickness="1" />
-                        <Line StartPoint="12,20" EndPoint="38,20" Stroke="White" StrokeThickness="1" />
-                        <Line StartPoint="12,25" EndPoint="30,25" Stroke="White" StrokeThickness="1" />
-                        <Line StartPoint="12,30" EndPoint="30,30" Stroke="White" StrokeThickness="1" />
-                      </Canvas>
-                      
-                      <StackPanel Grid.Column="1">
-                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="16"/>
-                        <TextBlock Text="{Binding Author}" FontSize="14" Margin="0,5,0,0"/>
-                        <TextBlock Text="{Binding DueDate}" Foreground="Gray" FontSize="12" Margin="0,5,0,0"/>
-                      </StackPanel>
-                      
-                      <Button Grid.Column="2" Content="Return" Command="{Binding ReturnCommand}" 
-                              Background="#2E74A8" Foreground="White" 
-                              VerticalAlignment="Center" Padding="15,10" CornerRadius="4"/>
-                    </Grid>
-                  </Border>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-            
-            <!-- Livres réservés -->
-            <TextBlock Text="Reserved Books" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10"/>
-            <ItemsControl ItemsSource="{Binding ReservedBooks}">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="vm:ReservedBookViewModel">
-                  <Border Background="#F8F9FA" CornerRadius="8" Padding="15" Margin="0,0,0,10">
-                    <Grid ColumnDefinitions="Auto,*,Auto">
-                      <!-- Book icon as vector graphic -->
-                      <Canvas Grid.Column="0" Width="50" Height="50" Margin="0,0,15,0">
-                        <Border Canvas.Left="5" Canvas.Top="5" Width="40" Height="40" 
-                                Background="#2E74A8" CornerRadius="3" />
-                        <Border Canvas.Left="7" Canvas.Top="7" Width="36" Height="36" 
-                                BorderBrush="White" BorderThickness="2" CornerRadius="3" />
-                        <Line StartPoint="12,10" EndPoint="38,10" Stroke="White" StrokeThickness="1" />
-                        <Line StartPoint="12,15" EndPoint="38,15" Stroke="White" StrokeThickness="1" />
-                        <Line StartPoint="12,20" EndPoint="38,20" Stroke="White" StrokeThickness="1" />
-                        <Line StartPoint="12,25" EndPoint="30,25" Stroke="White" StrokeThickness="1" />
-                        <Line StartPoint="12,30" EndPoint="30,30" Stroke="White" StrokeThickness="1" />
-                      </Canvas>
-                      
-                      <StackPanel Grid.Column="1">
-                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="16"/>
-                        <TextBlock Text="{Binding Author}" FontSize="14" Margin="0,5,0,0"/>
-                        <TextBlock Text="{Binding ReservationStatus}" Foreground="Gray" FontSize="12" Margin="0,5,0,0"/>
-                      </StackPanel>
-                      
-                      <Button Grid.Column="2" Content="Cancel" Command="{Binding CancelCommand}" 
-                              Background="#F44336" Foreground="White" 
-                              VerticalAlignment="Center" Padding="15,10" CornerRadius="4"/>
-                    </Grid>
-                  </Border>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <!-- Reserved books section -->
+            <Border Classes="card">
+              <StackPanel>
+                <TextBlock Text="Livres réservés" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="{StaticResource PrimaryBrush}"/>
+                
+                <ItemsControl ItemsSource="{Binding ReservedBooks}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ReservedBookViewModel">
+                      <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="10,15">
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                          <!-- Book cover -->
+                          <Border Grid.Column="0" Width="50" Height="70" CornerRadius="4" ClipToBounds="True" Margin="0,0,15,0">
+                            <Image Source="{Binding CoverImageUrl}" Stretch="UniformToFill"/>
+                          </Border>
+                          
+                          <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="16"/>
+                            <TextBlock Text="{Binding Author}" FontSize="14" Margin="0,5,0,0" Opacity="0.7"/>
+                            <TextBlock Text="{Binding ReservationStatus}" Foreground="{StaticResource PrimaryBrush}" FontSize="12" Margin="0,5,0,0"/>
+                          </StackPanel>
+                          
+                          <Button Grid.Column="2" Content="Annuler" Command="{Binding CancelCommand}" 
+                                  Classes="secondary" 
+                                  VerticalAlignment="Center" Padding="15,8"/>
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                
+                <!-- Show message when no reserved books -->
+                <TextBlock Text="Vous n'avez pas de livres réservés actuellement" 
+                          IsVisible="{Binding !ReservedBooks.Count}" 
+                          Opacity="0.7" HorizontalAlignment="Center" Margin="0,15,0,0"/>
+              </StackPanel>
+            </Border>
           </StackPanel>
         </Grid>
       </ScrollViewer>

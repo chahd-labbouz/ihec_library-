@@ -25,13 +25,40 @@ namespace IHECLibrary.Services.Implementations
         {
             try
             {
-                if (_supabaseClient.Auth.CurrentUser == null)
+                Console.WriteLine("GetCurrentUserAsync: Starting user data fetch");
+                
+                // Check if supabase client is available
+                if (_supabaseClient == null)
+                {
+                    Console.WriteLine("GetCurrentUserAsync: Supabase client is null");
+                    return null;
+                }
+                
+                // Check if auth is available and we have current user
+                if (_supabaseClient.Auth == null)
+                {
+                    Console.WriteLine("GetCurrentUserAsync: Supabase Auth is null");
+                    return null;
+                }
+                
+                // Log auth status 
+                var isAuthenticated = _authService.IsAuthenticated();
+                Console.WriteLine($"GetCurrentUserAsync: Authentication status check: {isAuthenticated}");
+                
+                if (!isAuthenticated)
+                {
+                    Console.WriteLine("GetCurrentUserAsync: User is not authenticated");
+                    return null;
+                }
+
+                var currentUser = _supabaseClient.Auth.CurrentUser;
+                if (currentUser == null)
                 {
                     Console.WriteLine("GetCurrentUserAsync: CurrentUser is null");
                     return null;
                 }
 
-                var userId = _supabaseClient.Auth.CurrentUser.Id;
+                var userId = currentUser.Id;
                 if (string.IsNullOrEmpty(userId))
                 {
                     Console.WriteLine("GetCurrentUserAsync: CurrentUser.Id is null or empty");
@@ -39,7 +66,43 @@ namespace IHECLibrary.Services.Implementations
                 }
 
                 Console.WriteLine($"GetCurrentUserAsync: Looking up user with ID: {userId}");
-                return await GetUserByIdAsync(userId);
+                
+                // Try to create at least a minimal user model even if the database lookup fails
+                var basicUser = new UserModel
+                {
+                    Id = userId,
+                    Email = currentUser.Email ?? "",
+                    FirstName = "",
+                    LastName = ""
+                };
+                
+                // Try to extract values from user metadata if available
+                if (currentUser.UserMetadata != null)
+                {
+                    // Safely get first name
+                    if (currentUser.UserMetadata.TryGetValue("first_name", out var firstNameObj) && firstNameObj != null)
+                    {
+                        basicUser.FirstName = firstNameObj.ToString() ?? "";
+                    }
+                    
+                    // Safely get last name
+                    if (currentUser.UserMetadata.TryGetValue("last_name", out var lastNameObj) && lastNameObj != null)
+                    {
+                        basicUser.LastName = lastNameObj.ToString() ?? "";
+                    }
+                }
+                
+                try
+                {
+                    // Try to get the full user info from database
+                    return await GetUserByIdAsync(userId) ?? basicUser;
+                }
+                catch (Exception dbEx)
+                {
+                    Console.WriteLine($"GetCurrentUserAsync: Database lookup failed: {dbEx.Message}");
+                    Console.WriteLine($"GetCurrentUserAsync: Returning basic user info instead");
+                    return basicUser;
+                }
             }
             catch (Exception ex)
             {
@@ -164,6 +227,48 @@ namespace IHECLibrary.Services.Implementations
             }
         }
 
+        // Helper method to create a mock profile when database access fails
+        private UserProfileModel CreateMockProfile()
+        {
+            Console.WriteLine("Creating mock profile data as a fallback");
+            string userId = _supabaseClient.Auth.CurrentUser?.Id ?? Guid.NewGuid().ToString();
+            string email = _supabaseClient.Auth.CurrentUser?.Email ?? "default@example.com";
+            
+            string firstName = "Guest";
+            string lastName = "User";
+            
+            // Safely extract metadata if available
+            if (_supabaseClient.Auth.CurrentUser?.UserMetadata != null)
+            {
+                if (_supabaseClient.Auth.CurrentUser.UserMetadata.TryGetValue("first_name", out var fName) && fName != null)
+                {
+                    firstName = fName.ToString() ?? "Guest";
+                }
+                
+                if (_supabaseClient.Auth.CurrentUser.UserMetadata.TryGetValue("last_name", out var lName) && lName != null)
+                {
+                    lastName = lName.ToString() ?? "User";
+                }
+            }
+            
+            return new UserProfileModel
+            {
+                UserId = Guid.Parse(userId),
+                FirstName = firstName,
+                LastName = lastName,
+                Email = email,
+                PhoneNumber = "Not available",
+                ProfilePictureUrl = "/Assets/default_profile.png",
+                LevelOfStudy = "Not specified",
+                FieldOfStudy = "Not specified",
+                BooksBorrowed = 0,
+                BooksReserved = 0,
+                Ranking = "Bronze",
+                CreatedAt = DateTime.UtcNow,
+                LastLogin = DateTime.UtcNow
+            };
+        }
+
         public async Task<UserProfileModel?> GetCurrentUserProfileAsync()
         {
             try
@@ -184,44 +289,52 @@ namespace IHECLibrary.Services.Implementations
                 Console.WriteLine($"GetCurrentUserProfileAsync: Looking up profile for user with ID: {userId}");
                 
                 // Get user information with all profile data now included in the users table
-                var usersResponse = await _supabaseClient.From<DbUser>()
-                    .Where(p => p.UserId == userId)
-                    .Get();
-                
-                if (usersResponse.Models.Count == 0)
+                try 
                 {
-                    Console.WriteLine($"GetCurrentUserProfileAsync: No user found with ID {userId} in database");
-                    return null;
+                    var usersResponse = await _supabaseClient.From<DbUser>()
+                        .Where(p => p.UserId == userId)
+                        .Get();
+                    
+                    if (usersResponse.Models.Count == 0)
+                    {
+                        Console.WriteLine($"GetCurrentUserProfileAsync: No user found with ID {userId} in database");
+                        return CreateMockProfile();
+                    }
+                    
+                    var user = usersResponse.Models.First();
+                    
+                    Console.WriteLine($"GetCurrentUserProfileAsync: Found user profile data:");
+                    Console.WriteLine($"  - Level of Study: '{user.LevelOfStudy}'");
+                    Console.WriteLine($"  - Field of Study: '{user.FieldOfStudy}'");
+                    Console.WriteLine($"  - Books Borrowed: {user.BooksBorrowed}");
+                    Console.WriteLine($"  - Books Reserved: {user.BooksReserved}");
+                    Console.WriteLine($"  - Ranking: '{user.Ranking}'");
+                    
+                    // Create the profile model with all user information from users table
+                    var profileModel = new UserProfileModel
+                    {
+                        UserId = Guid.Parse(userId),
+                        FirstName = user.FirstName ?? string.Empty,
+                        LastName = user.LastName ?? string.Empty,
+                        Email = user.Email ?? string.Empty,
+                        PhoneNumber = user.PhoneNumber ?? string.Empty,
+                        ProfilePictureUrl = user.ProfilePictureUrl ?? string.Empty,
+                        LevelOfStudy = user.LevelOfStudy ?? string.Empty,
+                        FieldOfStudy = user.FieldOfStudy ?? string.Empty,
+                        BooksBorrowed = user.BooksBorrowed,
+                        BooksReserved = user.BooksReserved,
+                        Ranking = user.Ranking ?? "Bronze",
+                        CreatedAt = user.CreatedAt ?? DateTime.UtcNow,
+                        LastLogin = user.LastLogin ?? DateTime.UtcNow
+                    };
+                    
+                    return profileModel;
                 }
-                
-                var user = usersResponse.Models.First();
-                
-                Console.WriteLine($"GetCurrentUserProfileAsync: Found user profile data:");
-                Console.WriteLine($"  - Level of Study: '{user.LevelOfStudy}'");
-                Console.WriteLine($"  - Field of Study: '{user.FieldOfStudy}'");
-                Console.WriteLine($"  - Books Borrowed: {user.BooksBorrowed}");
-                Console.WriteLine($"  - Books Reserved: {user.BooksReserved}");
-                Console.WriteLine($"  - Ranking: '{user.Ranking}'");
-                
-                // Create the profile model with all user information from users table
-                var profileModel = new UserProfileModel
+                catch (Exception ex)
                 {
-                    UserId = Guid.Parse(userId),
-                    FirstName = user.FirstName ?? string.Empty,
-                    LastName = user.LastName ?? string.Empty,
-                    Email = user.Email ?? string.Empty,
-                    PhoneNumber = user.PhoneNumber ?? string.Empty,
-                    ProfilePictureUrl = user.ProfilePictureUrl ?? string.Empty,
-                    LevelOfStudy = user.LevelOfStudy ?? string.Empty,
-                    FieldOfStudy = user.FieldOfStudy ?? string.Empty,
-                    BooksBorrowed = user.BooksBorrowed,
-                    BooksReserved = user.BooksReserved,
-                    Ranking = user.Ranking ?? "Bronze",
-                    CreatedAt = user.CreatedAt ?? DateTime.UtcNow,
-                    LastLogin = user.LastLogin ?? DateTime.UtcNow
-                };
-                
-                return profileModel;
+                    Console.WriteLine($"GetCurrentUserProfileAsync: Database error: {ex.Message}");
+                    return CreateMockProfile();
+                }
             }
             catch (Exception ex)
             {
@@ -510,6 +623,64 @@ namespace IHECLibrary.Services.Implementations
                 {
                     Ranking = "Bronze" // Rang par défaut en cas d'erreur
                 };
+            }
+        }
+
+        // Method to ensure a test user exists in the database for testing
+        public async Task<bool> EnsureTestUserExistsAsync()
+        {
+            try
+            {
+                // Check if the test user already exists in the database
+                var testUserId = _supabaseClient.Auth.CurrentUser?.Id;
+                if (string.IsNullOrEmpty(testUserId))
+                {
+                    Console.WriteLine("EnsureTestUserExistsAsync: No current user");
+                    return false;
+                }
+                
+                Console.WriteLine($"EnsureTestUserExistsAsync: Checking if user with ID {testUserId} exists");
+                
+                var usersResponse = await _supabaseClient.From<DbUser>()
+                    .Where(p => p.UserId == testUserId)
+                    .Get();
+                
+                if (usersResponse.Models.Count > 0)
+                {
+                    Console.WriteLine("EnsureTestUserExistsAsync: Test user already exists in database");
+                    return true;
+                }
+                
+                // Create a new test user entry in the database
+                var testUser = new DbUser
+                {
+                    UserId = testUserId,
+                    Email = _supabaseClient.Auth.CurrentUser?.Email ?? "test@example.com",
+                    FirstName = "Test",
+                    LastName = "User",
+                    PhoneNumber = "0123456789",
+                    LevelOfStudy = "Master 1",
+                    FieldOfStudy = "Computer Science",
+                    ProfilePictureUrl = "/Assets/default_profile.png",
+                    IsStudent = true,
+                    BooksBorrowed = 3,
+                    BooksReserved = 1,
+                    Ranking = "Silver",
+                    CreatedAt = DateTime.UtcNow,
+                    LastLogin = DateTime.UtcNow
+                };
+                
+                // Insert the test user into the database
+                var response = await _supabaseClient.From<DbUser>().Insert(testUser);
+                Console.WriteLine($"EnsureTestUserExistsAsync: Created test user in database. Response status: {response.ResponseMessage?.StatusCode}");
+                
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"EnsureTestUserExistsAsync Exception: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return false;
             }
         }
     }

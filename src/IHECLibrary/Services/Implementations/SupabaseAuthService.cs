@@ -350,14 +350,36 @@ namespace IHECLibrary.Services.Implementations
         {
             try
             {
+                // Get the current user from Supabase Auth
                 var currentUser = _supabaseClient.Auth.CurrentUser;
-                var isAuth = currentUser != null;
+                
+                // Check if the user exists and if there's a valid session
+                var isAuth = currentUser != null && !string.IsNullOrEmpty(currentUser.Id);
+                
+                // Log the result for debugging
                 Console.WriteLine($"IsAuthenticated check: {isAuth}, CurrentUser ID: {currentUser?.Id ?? "null"}");
+                
+                // If not authenticated but should be, try to refresh the session
+                if (!isAuth && _supabaseClient.Auth.CurrentSession != null)
+                {
+                    Console.WriteLine("User not authenticated but session exists, trying to refresh token");
+                    try
+                    {
+                        // Trigger an async token refresh
+                        _ = _supabaseClient.Auth.RefreshSession();
+                    }
+                    catch (Exception refreshEx)
+                    {
+                        Console.WriteLine($"Error refreshing session: {refreshEx.Message}");
+                    }
+                }
+                
                 return isAuth;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception in IsAuthenticated: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return false;
             }
         }

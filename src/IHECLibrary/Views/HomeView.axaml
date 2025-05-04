@@ -13,168 +13,178 @@
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
     
-    <!-- Barre de navigation -->
-    <Grid Grid.Row="0" Background="White" Height="70">
+    <!-- Top navigation bar in deeper blue -->
+    <Grid Grid.Row="0" Background="{StaticResource PrimaryBrush}" Height="60">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="*"/>
         <ColumnDefinition Width="Auto"/>
       </Grid.ColumnDefinitions>
       
-      <!-- Logo et titre -->
+      <!-- Logo and title -->
       <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
-        <TextBlock Text="IHEC Library" FontSize="24" FontWeight="Bold" Foreground="#2E74A8"/>
+        <TextBlock Text="📚" FontSize="22" Margin="0,0,8,0" Foreground="White"/>
+        <TextBlock Text="IHEC BookZone" FontSize="22" FontWeight="SemiBold" Foreground="White"/>
       </StackPanel>
       
-      <!-- Menu de navigation -->
+      <!-- Center navigation menu -->
       <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
         <Button Content="Home" Command="{Binding NavigateToHomeCommand}" 
-                Background="#E6F2F8" Foreground="#2E74A8" 
-                Padding="15,10" Margin="5,0" CornerRadius="20"/>
+                Background="Transparent" Foreground="White" 
+                Padding="12,8" Margin="5,0" CornerRadius="4"/>
         <Button Content="Library" Command="{Binding NavigateToLibraryCommand}" 
-                Background="Transparent" Foreground="#2E74A8" 
-                Padding="15,10" Margin="5,0" CornerRadius="20"/>
-        <Button Content="HEC 1.0" Command="{Binding NavigateToChatbotCommand}" 
-                Background="Transparent" Foreground="#2E74A8" 
-                Padding="15,10" Margin="5,0" CornerRadius="20"/>
+                Background="Transparent" Foreground="White" 
+                Padding="12,8" Margin="5,0" CornerRadius="4"/>
         <Button Content="Profile" Command="{Binding NavigateToProfileCommand}" 
-                Background="Transparent" Foreground="#2E74A8" 
-                Padding="15,10" Margin="5,0" CornerRadius="20"/>
+                Background="Transparent" Foreground="White" 
+                Padding="12,8" Margin="5,0" CornerRadius="4"/>
+        <Button Content="Contact" 
+                Background="Transparent" Foreground="White" 
+                Padding="12,8" Margin="5,0" CornerRadius="4"/>
       </StackPanel>
       
-      <!-- Recherche et profil -->
+      <!-- Right side: Search and profile -->
       <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
-        <Border CornerRadius="15" Padding="10,7,10,7" Background="#F0F2F5" Margin="0,0,10,0">
-          <TextBox Text="{Binding SearchQuery}" Watermark="Search books..." Width="200" 
-                 BorderThickness="0" Background="Transparent"/>
+        <Button Content="Ask" Padding="12,5" Margin="0,0,15,0" 
+                Background="Transparent" Foreground="White" 
+                BorderBrush="White" BorderThickness="1" CornerRadius="4"/>
+        <Border CornerRadius="50" Width="32" Height="32" ClipToBounds="True" 
+                Margin="0,0,8,0" Background="#F0F2F5">
+          <Image Source="{Binding UserProfilePicture}" Stretch="UniformToFill"/>
         </Border>
-        <Grid Margin="5,0,0,0">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-          </Grid.ColumnDefinitions>
-          
-          <Border Grid.Column="0" CornerRadius="50" Width="32" Height="32" ClipToBounds="True" 
-                  Margin="0,0,8,0" Background="#F0F2F5">
-            <Image Source="{Binding UserProfilePicture}" Stretch="UniformToFill"/>
-          </Border>
-          <TextBlock Grid.Column="1" Text="{Binding UserFullName}" VerticalAlignment="Center" 
-                     FontSize="13" FontWeight="SemiBold"/>
-        </Grid>
       </StackPanel>
     </Grid>
     
-    <!-- Contenu principal -->
-    <ScrollViewer Grid.Row="1" Padding="20" Background="#eff4ff">
+    <!-- Main content -->
+    <ScrollViewer Grid.Row="1" Padding="0" Background="White">
       <StackPanel>
-        <!-- Message de bienvenue -->
-        <TextBlock Text="{Binding WelcomeMessage}" FontSize="24" FontWeight="Bold" Margin="0,10,0,5" Foreground="#2e74a8"/>
-        <TextBlock Text="{Binding RecommendationSubtitle}" FontSize="14" Margin="0,0,0,20" Foreground="#2e74a8"/>
-        
-        <!-- Section de recommandations -->
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-          </Grid.ColumnDefinitions>
+        <!-- Welcome section -->
+        <Grid Margin="0,0,0,30">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
           
-          <TextBlock Grid.Column="0" Text="Recommended for You" FontSize="18" FontWeight="SemiBold" Foreground="#2e74a8"/>
-          <Button Grid.Column="1" Content="View All" Command="{Binding ViewAllRecommendationsCommand}" 
-                  Background="Transparent" Foreground="#2e74a8" Padding="0"/>
+          <!-- White welcome area -->
+          <StackPanel Grid.Row="0" Margin="40,30,40,0">
+            <TextBlock Text="{Binding WelcomeMessage}" FontSize="24" FontWeight="SemiBold" Margin="0,0,0,10"/>
+            
+            <!-- Recommendations title -->
+            <Grid Margin="0,20,0,10">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              
+              <StackPanel Grid.Column="0">
+                <TextBlock Text="Recommandations pour vous" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource PrimaryBrush}"/>
+                <TextBlock Text="Livres recommandés basés sur votre domaine d'étude: Finance" 
+                           FontSize="14" Opacity="0.7" Margin="0,5,0,0"/>
+              </StackPanel>
+              
+              <Button Grid.Column="1" Content="Voir plus de recommandations" Command="{Binding ViewAllRecommendationsCommand}" 
+                      Classes="primary" VerticalAlignment="Top"/>
+            </Grid>
+          </StackPanel>
         </Grid>
         
-        <!-- Liste de livres recommandés -->
-        <ItemsControl ItemsSource="{Binding RecommendedBooks}" Margin="0,15,0,30">
+        <!-- Book recommendations -->
+        <ItemsControl ItemsSource="{Binding RecommendedBooks}" Margin="40,0,40,30">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
-              <WrapPanel Orientation="Horizontal" />
+              <WrapPanel Orientation="Horizontal"/>
             </ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
           <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="vm:BookViewModel">
-              <Border Width="240" Height="260" Margin="0,0,20,20" CornerRadius="10">
-                <Border.Background>
-                  <SolidColorBrush Color="{Binding CardColor}" />
-                </Border.Background>
-                <Grid Margin="15">
+              <!-- Book card with soft shadow -->
+              <Border Classes="card" Width="210" Height="340" Margin="0,0,20,20">
+                <Grid>
                   <Grid.RowDefinitions>
-                    <RowDefinition Height="100"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="180"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                   </Grid.RowDefinitions>
                   
-                  <!-- Book Icon -->
-                  <Border Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Panel>
-                      <!-- Book icon with orange color -->
-                      <Border Width="70" Height="80" CornerRadius="3" Background="#FF8370" BorderThickness="2" BorderBrush="#000000">
-                        <!-- Book Cover Label -->
-                        <Border Width="40" Height="20" VerticalAlignment="Top" Margin="0,12,0,0" 
-                                Background="#FFF8E1" BorderBrush="#000000" BorderThickness="1" 
-                                HorizontalAlignment="Center" CornerRadius="2" />
-                      </Border>
-                      <!-- Book bottom part -->
-                      <Border Width="70" Height="10" VerticalAlignment="Bottom" Background="#FFF8E1" 
-                              BorderBrush="#000000" BorderThickness="1,0,1,1" CornerRadius="0,0,3,3" 
-                              Margin="0,70,0,0" />
-                    </Panel>
-                  </Border>
-                  
-                  <!-- Availability Badge -->
-                  <Border Grid.Row="1" Background="{Binding IsAvailable, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#4CAF50,#F44336'}"
-                          CornerRadius="15" HorizontalAlignment="Center" Padding="12,4" Margin="0,10,0,15">
-                    <TextBlock Text="{Binding IsAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Available,Unavailable'}" 
-                               Foreground="White" FontSize="12" FontWeight="SemiBold"/>
+                  <!-- Book Cover Image in larger size -->
+                  <Border Grid.Row="0" ClipToBounds="True" CornerRadius="6" Margin="0,0,0,10">
+                    <Image Source="{Binding CoverImageUrl}" Stretch="Uniform" Width="150" Height="180" HorizontalAlignment="Center"/>
                   </Border>
                   
                   <!-- Book Title -->
-                  <TextBlock Grid.Row="2" Text="{Binding Title}" 
-                             FontWeight="SemiBold" FontSize="16" 
+                  <TextBlock Grid.Row="1" Text="{Binding Title}" 
+                             FontWeight="SemiBold" FontSize="15" 
                              HorizontalAlignment="Left" TextWrapping="Wrap" 
                              MaxHeight="45" TextTrimming="CharacterEllipsis"/>
                   
                   <!-- Author -->
-                  <TextBlock Grid.Row="3" Text="{Binding Author}" 
-                             FontSize="14" 
+                  <TextBlock Grid.Row="2" Text="{Binding Author}" 
+                             FontSize="13" Opacity="0.8"
                              HorizontalAlignment="Left" Margin="0,5,0,0"/>
                   
-                  <!-- Category -->
-                  <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,5,0,10">
-                    <TextBlock Text="Category: " FontSize="12" Opacity="0.7"/>
-                    <TextBlock Text="{Binding Category}" FontSize="12" FontWeight="Medium"/>
+                  <!-- Rating stars -->
+                  <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,8,0,0">
+                    <TextBlock Text="★★★★★" Foreground="#FFD700" FontSize="14"/>
+                    <TextBlock Text="4.5" Margin="5,0,0,0" FontSize="13" Opacity="0.7"/>
                   </StackPanel>
                   
-                  <!-- Action Button -->
-                  <Button Grid.Row="5" Command="{Binding ActionCommand}" 
-                          Height="38" CornerRadius="20" 
-                          VerticalAlignment="Bottom" 
-                          VerticalContentAlignment="Center"
-                          HorizontalAlignment="Stretch"
-                          HorizontalContentAlignment="Center">
-                    <Button.Background>
-                      <SolidColorBrush Color="{Binding IsAvailable, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#4169E1,White'}" />
-                    </Button.Background>
-                    <Button.Foreground>
-                      <SolidColorBrush Color="{Binding IsAvailable, Converter={StaticResource BoolToColorConverter}, ConverterParameter='White,#4169E1'}" />
-                    </Button.Foreground>
-                    <Button.BorderBrush>
-                      <SolidColorBrush Color="{Binding IsAvailable, Converter={StaticResource BoolToColorConverter}, ConverterParameter='Transparent,#4169E1'}" />
-                    </Button.BorderBrush>
-                    <Button.BorderThickness>
-                      <Thickness>1</Thickness>
-                    </Button.BorderThickness>
-                    <TextBlock Text="{Binding IsAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Borrow,Reserve'}"/>
-                  </Button>
+                  <!-- Action buttons -->
+                  <StackPanel Grid.Row="4" Orientation="Horizontal" VerticalAlignment="Bottom">
+                    <Button Content="Emprunter" Classes="primary"
+                            HorizontalAlignment="Left" Padding="12,6" Margin="0,0,8,0"/>
+                    <Button Content="Détails"
+                            Classes="secondary" 
+                            HorizontalAlignment="Left" Padding="12,6"/>
+                  </StackPanel>
                 </Grid>
               </Border>
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
         
-        <!-- Autres sections (populaires, récents, etc.) peuvent être ajoutées ici -->
+        <!-- Categories section -->
+        <StackPanel Margin="40,0,40,30">
+          <TextBlock Text="Explorer par catégorie" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="{StaticResource PrimaryBrush}"/>
+          
+          <WrapPanel>
+            <Border Classes="card" Width="180" Height="120" Margin="0,0,15,15" Background="#e6f2ff">
+              <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Finance" FontWeight="SemiBold" FontSize="16" HorizontalAlignment="Center" Foreground="{StaticResource PrimaryBrush}"/>
+                <TextBlock Text="120 livres" FontSize="13" HorizontalAlignment="Center" Opacity="0.7" Margin="0,5,0,0"/>
+              </StackPanel>
+            </Border>
+            
+            <Border Classes="card" Width="180" Height="120" Margin="0,0,15,15" Background="#fff2e6">
+              <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Marketing" FontWeight="SemiBold" FontSize="16" HorizontalAlignment="Center" Foreground="{StaticResource PrimaryBrush}"/>
+                <TextBlock Text="58 livres" FontSize="13" HorizontalAlignment="Center" Opacity="0.7" Margin="0,5,0,0"/>
+              </StackPanel>
+            </Border>
+            
+            <Border Classes="card" Width="180" Height="120" Margin="0,0,15,15" Background="#e6ffe6">
+              <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Gestion" FontWeight="SemiBold" FontSize="16" HorizontalAlignment="Center" Foreground="{StaticResource PrimaryBrush}"/>
+                <TextBlock Text="142 livres" FontSize="13" HorizontalAlignment="Center" Opacity="0.7" Margin="0,5,0,0"/>
+              </StackPanel>
+            </Border>
+            
+            <Border Classes="card" Width="180" Height="120" Margin="0,0,15,15" Background="#f2e6ff">
+              <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Big Data" FontWeight="SemiBold" FontSize="16" HorizontalAlignment="Center" Foreground="{StaticResource PrimaryBrush}"/>
+                <TextBlock Text="65 livres" FontSize="13" HorizontalAlignment="Center" Opacity="0.7" Margin="0,5,0,0"/>
+              </StackPanel>
+            </Border>
+            
+            <Border Classes="card" Width="180" Height="120" Margin="0,0,15,15" Background="#ffe6e6">
+              <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Comptabilité" FontWeight="SemiBold" FontSize="16" HorizontalAlignment="Center" Foreground="{StaticResource PrimaryBrush}"/>
+                <TextBlock Text="87 livres" FontSize="13" HorizontalAlignment="Center" Opacity="0.7" Margin="0,5,0,0"/>
+              </StackPanel>
+            </Border>
+          </WrapPanel>
+        </StackPanel>
       </StackPanel>
     </ScrollViewer>
   </Grid>
