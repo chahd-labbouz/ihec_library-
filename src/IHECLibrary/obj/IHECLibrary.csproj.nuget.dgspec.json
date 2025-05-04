@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\GIGABYTE\\Desktop\\ihec_library-\\src\\IHECLibrary\\IHECLibrary.csproj": {}
+    "C:\\Users\\user\\Desktop\\ihec_library-\\src\\IHECLibrary\\IHECLibrary.csproj": {}
   },
   "projects": {
-    "C:\\Users\\GIGABYTE\\Desktop\\ihec_library-\\src\\IHECLibrary\\IHECLibrary.csproj": {
+    "C:\\Users\\user\\Desktop\\ihec_library-\\src\\IHECLibrary\\IHECLibrary.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\GIGABYTE\\Desktop\\ihec_library-\\src\\IHECLibrary\\IHECLibrary.csproj",
+        "projectUniqueName": "C:\\Users\\user\\Desktop\\ihec_library-\\src\\IHECLibrary\\IHECLibrary.csproj",
         "projectName": "IHECLibrary",
-        "projectPath": "C:\\Users\\GIGABYTE\\Desktop\\ihec_library-\\src\\IHECLibrary\\IHECLibrary.csproj",
-        "packagesPath": "C:\\Users\\GIGABYTE\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\GIGABYTE\\Desktop\\ihec_library-\\src\\IHECLibrary\\obj\\",
+        "projectPath": "C:\\Users\\user\\Desktop\\ihec_library-\\src\\IHECLibrary\\IHECLibrary.csproj",
+        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\user\\Desktop\\ihec_library-\\src\\IHECLibrary\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\GIGABYTE\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,7 +26,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -136,7 +135,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200\\RuntimeIdentifierGraph.json"
         }
       }
     }

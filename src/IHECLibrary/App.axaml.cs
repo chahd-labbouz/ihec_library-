@@ -195,8 +195,8 @@ namespace IHECLibrary
             
             // First register Supabase client and authentication services
             // Supabase configuration
-            var supabaseUrl = "https://kwsczjtdjexydcbzbpws.supabase.co";
-            var supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3c2N6anRkamV4eWRjYnpicHdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwNjkyNzMsImV4cCI6MjA2MDY0NTI3M30.xfwy8okepbA3d0yaDCUpUXUyvKYUKR1w7SLW3gam5HM";
+            var supabaseUrl = "https://byxjlztcqjyyumkgapfe.supabase.co";
+            var supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5eGpsenRjcWp5eXVta2dhcGZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYxODM2MjgsImV4cCI6MjA2MTc1OTYyOH0.AuSYnnvNOf4QbxSm7GUXsWZhmOzctvQXNy4cVm3SOJc";
             var supabaseOptions = new SupabaseOptions
             {
                 AutoRefreshToken = true,
