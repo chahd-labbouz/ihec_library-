@@ -78,9 +78,6 @@
                 <TextBlock Text="Livres recommandés basés sur votre domaine d'étude: Finance" 
                            FontSize="14" Opacity="0.7" Margin="0,5,0,0"/>
               </StackPanel>
-              
-              <Button Grid.Column="1" Content="Voir plus de recommandations" Command="{Binding ViewAllRecommendationsCommand}" 
-                      Classes="primary" VerticalAlignment="Top"/>
             </Grid>
           </StackPanel>
         </Grid>
