@@ -129,7 +129,7 @@
                   
                   <!-- Action buttons -->
                   <StackPanel Grid.Row="4" Orientation="Horizontal" VerticalAlignment="Bottom">
-                    <Button Content="Emprunter" Classes="primary"
+                    <Button Content="Emprunter" Click="OnBorrowButtonClicked" Tag="{Binding}" Classes="primary"
                             HorizontalAlignment="Left" Padding="12,6" Margin="0,0,8,0"/>
                     <Button Content="Détails"
                             Classes="secondary" 

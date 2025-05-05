@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using IHECLibrary.Services;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -125,19 +126,38 @@ namespace IHECLibrary.ViewModels
             }
         }
 
-        public ICommand ActionCommand => ViewDetailsCommand;
-
-        [RelayCommand]
-        private void ViewDetails()
+        // Direct command implementation for the action button
+        public ICommand ActionCommand => new RelayCommand(ExecuteAction);
+        
+        private void ExecuteAction()
         {
             try
             {
-                // Navigate to book details if navigation service is available
-                _navigationService?.NavigateToAsync("BookDetails", Id);
+                Console.WriteLine($"ExecuteAction called for book: {Id} - {Title}");
+                
+                // Navigate directly to borrow form
+                if (_navigationService != null)
+                {
+                    Console.WriteLine($"Navigating to BorrowForm for book: {Id} - {Title}");
+                    
+                    // Create a simple parameter object with book data
+                    var param = new Dictionary<string, string>
+                    {
+                        ["BookId"] = Id,
+                        ["BookTitle"] = Title
+                    };
+                    
+                    _navigationService.NavigateToAsync("BorrowForm", param).Wait();
+                }
+                else
+                {
+                    Console.WriteLine("Error: NavigationService is null");
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error viewing book details: {ex.Message}");
+                Console.WriteLine($"Error in ExecuteAction: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
             }
         }
 

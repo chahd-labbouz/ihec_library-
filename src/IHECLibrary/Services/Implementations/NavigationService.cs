@@ -46,8 +46,11 @@ namespace IHECLibrary.Services.Implementations
                 "Library" => _serviceProvider.GetRequiredService<LibraryViewModel>(),
                 "Profile" => _serviceProvider.GetRequiredService<ProfileViewModel>(),
                 "EditProfile" => _serviceProvider.GetRequiredService<EditProfileViewModel>(),
+                "BorrowBook" => _serviceProvider.GetRequiredService<BorrowBookViewModel>(),
                 "Chatbot" => _serviceProvider.GetRequiredService<ChatbotViewModel>(),
                 "AdminDashboard" => _serviceProvider.GetRequiredService<AdminDashboardViewModel>(),
+                "BookDetails" => _serviceProvider.GetRequiredService<BookDetailsViewModel>(),
+                "BorrowForm" => _serviceProvider.GetRequiredService<BorrowFormViewModel>(),
                 _ => throw new ArgumentException($"Vue non reconnue: {viewName}")
             };
 

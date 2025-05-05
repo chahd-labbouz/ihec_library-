@@ -22,6 +22,9 @@ namespace IHECLibrary
     {
         private IServiceProvider? _serviceProvider;
         public static bool RunTests = false;
+        
+        // Add a static property to access services from views
+        public static IServiceProvider? Services { get; private set; }
 
         public override void Initialize()
         {
@@ -59,6 +62,9 @@ namespace IHECLibrary
                 var services = new ServiceCollection();
                 ConfigureServices(services);
                 _serviceProvider = services.BuildServiceProvider();
+                
+                // Set the static property
+                Services = _serviceProvider;
 
                 if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
                 {
@@ -288,6 +294,26 @@ namespace IHECLibrary
             services.AddTransient<EditProfileViewModel>(provider => new EditProfileViewModel(
                 provider.GetRequiredService<IUserService>(),
                 provider.GetRequiredService<INavigationService>()
+            ));
+            
+            // Add BorrowBookViewModel registration
+            services.AddTransient<BorrowBookViewModel>(provider => new BorrowBookViewModel(
+                provider.GetRequiredService<INavigationService>(),
+                provider.GetRequiredService<IBookService>(),
+                provider.GetRequiredService<IUserService>()
+            ));
+            
+            // Add BookDetailsViewModel registration
+            services.AddTransient<BookDetailsViewModel>(provider => new BookDetailsViewModel(
+                provider.GetRequiredService<INavigationService>(),
+                provider.GetRequiredService<IBookService>()
+            ));
+            
+            // Add BorrowFormViewModel registration
+            services.AddTransient<BorrowFormViewModel>(provider => new BorrowFormViewModel(
+                provider.GetRequiredService<INavigationService>(),
+                provider.GetRequiredService<IBookService>(),
+                provider.GetRequiredService<IUserService>()
             ));
             
             // Register MainWindowViewModel with explicit dependencies

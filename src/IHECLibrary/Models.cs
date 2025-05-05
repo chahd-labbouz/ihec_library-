@@ -22,7 +22,10 @@ namespace IHECLibrary
         public bool IsLikedByCurrentUser { get; set; }
         public string Language { get; set; } = string.Empty;
         public decimal RatingAverage { get; set; } = 0;
+        public double Rating { get; set; } = 0;
+        public int PageCount { get; set; } = 0;
         public string AvailabilityStatus { get; set; } = "Available";
+        public string AvailabilityColor { get; set; } = "#4CAF50"; // Green for available by default
         
         // Helper method to determine if the book is available
         public bool IsAvailable()

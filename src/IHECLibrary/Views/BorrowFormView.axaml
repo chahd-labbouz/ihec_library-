@@ -1,0 +1,135 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:IHECLibrary.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="700"
+             x:Class="IHECLibrary.Views.BorrowFormView"
+             x:DataType="vm:BorrowFormViewModel">
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+    
+    <!-- Navigation bar -->
+    <Grid Grid.Row="0" Background="{StaticResource PrimaryBrush}" Height="60">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      
+      <!-- Logo and title -->
+      <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
+        <TextBlock Text="📚" FontSize="22" Margin="0,0,8,0" Foreground="White"/>
+        <TextBlock Text="IHEC BookZone" FontSize="22" FontWeight="SemiBold" Foreground="White"/>
+      </StackPanel>
+      
+      <!-- Center navigation menu -->
+      <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Button Content="Home" Command="{Binding NavigateToHomeCommand}" 
+                Background="Transparent" Foreground="White" 
+                Padding="12,8" Margin="5,0" CornerRadius="4"/>
+        <Button Content="Library" Command="{Binding NavigateToLibraryCommand}" 
+                Background="Transparent" Foreground="White" 
+                Padding="12,8" Margin="5,0" CornerRadius="4"/>
+        <Button Content="Profile" Command="{Binding NavigateToProfileCommand}" 
+                Background="Transparent" Foreground="White" 
+                Padding="12,8" Margin="5,0" CornerRadius="4"/>
+        <Button Content="Ask" Command="{Binding NavigateToChatbotCommand}" 
+                Background="Transparent" Foreground="White" 
+                Padding="12,8" Margin="5,0" CornerRadius="4"/>
+      </StackPanel>
+      
+      <!-- Right side: Profile -->
+      <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
+        <Border CornerRadius="50" Width="32" Height="32" ClipToBounds="True" 
+                Margin="0,0,8,0" Background="{StaticResource PrimaryBrush}">
+          <Image Source="avares://IHECLibrary/Assets/balbouz.png" Stretch="UniformToFill"/>
+        </Border>
+      </StackPanel>
+    </Grid>
+    
+    <!-- Main content -->
+    <Grid Grid.Row="1" Background="#F5F5F5">
+      <Border Margin="60,30,60,10" Background="White" CornerRadius="5" BoxShadow="0 2 10 0 #15000000">
+        <Grid>
+          <StackPanel Margin="30">
+            <!-- Form title -->
+            <TextBlock Text="Emprunter un Livre" FontSize="24" FontWeight="SemiBold" Margin="0,0,0,20"/>
+            
+            <!-- Section title -->
+            <Border Background="White" BorderBrush="#EEEEEE" BorderThickness="0,0,0,1" Margin="0,0,0,20">
+              <TextBlock Text="Informations d'Emprunt" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10"/>
+            </Border>
+            
+            <!-- Form fields -->
+            <StackPanel Spacing="20">
+              <!-- Full Name -->
+              <StackPanel>
+                <TextBlock Text="Nom Complet" Margin="0,0,0,5"/>
+                <TextBox Text="{Binding FullName}" Watermark="Entrez votre nom complet" Height="40"/>
+              </StackPanel>
+              
+              <!-- Email -->
+              <StackPanel>
+                <TextBlock Text="Email" Margin="0,0,0,5"/>
+                <TextBox Text="{Binding Email}" Watermark="Entrez votre email" Height="40"/>
+              </StackPanel>
+              
+              <!-- Book title -->
+              <StackPanel>
+                <TextBlock Text="Livre" Margin="0,0,0,5"/>
+                <TextBox Text="{Binding BookTitle}" IsReadOnly="True" Height="40"/>
+              </StackPanel>
+              
+              <!-- Borrow date -->
+              <StackPanel>
+                <TextBlock Text="Date d'Emprunt" Margin="0,0,0,5"/>
+                <DatePicker SelectedDate="{Binding BorrowDate, Mode=TwoWay}" Height="40"/>
+              </StackPanel>
+              
+              <!-- Return date -->
+              <StackPanel>
+                <TextBlock Text="Date de Retour (Maximum 15 jours)" Margin="0,0,0,5"/>
+                <DatePicker SelectedDate="{Binding ReturnDate, Mode=TwoWay}" Height="40"/>
+              </StackPanel>
+              
+              <!-- Info text -->
+              <TextBlock Text="La période d'emprunt est limitée à 15 jours" FontSize="12" Foreground="#666666" Margin="0,0,0,10"/>
+              
+              <!-- Terms checkbox -->
+              <CheckBox Content="J'accepte les conditions d'emprunt et je m'engage à retourner le livre en bon état avant la date limite" 
+                        IsChecked="{Binding AcceptTerms}" Margin="0,0,0,20"/>
+            </StackPanel>
+          </StackPanel>
+        </Grid>
+      </Border>
+    </Grid>
+    
+    <!-- Footer buttons (fixed at bottom) -->
+    <Border Grid.Row="2" Background="White" Height="70" BoxShadow="0 -2 10 0 #15000000">
+      <Grid Margin="60,0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        
+        <!-- Action buttons -->
+        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="15" VerticalAlignment="Center">
+          <Button Content="Annuler" Command="{Binding CancelCommand}" 
+                  Background="Transparent" BorderBrush="#DDDDDD" BorderThickness="1"
+                  Foreground="Black" Width="120" Height="40"
+                  CornerRadius="4"/>
+          
+          <Button Content="Confirmer l'Emprunt" Command="{Binding ConfirmBorrowCommand}" 
+                  Background="#DDDDDD" Foreground="#AAAAAA" 
+                  Width="200" Height="40" CornerRadius="4"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl> 

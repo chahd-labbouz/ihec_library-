@@ -177,7 +177,7 @@
                       <!-- Action buttons -->
                       <StackPanel Grid.Row="4" Orientation="Horizontal" VerticalAlignment="Bottom">
                         <Button Content="{Binding IsAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Emprunter,Réserver'}" 
-                                Command="{Binding ActionCommand}"
+                                Click="OnBorrowButtonClicked" Tag="{Binding}"
                                 Classes="primary"
                                 HorizontalAlignment="Left" Padding="12,6" Margin="0,0,8,0"/>
                         <Button Content="Détails"

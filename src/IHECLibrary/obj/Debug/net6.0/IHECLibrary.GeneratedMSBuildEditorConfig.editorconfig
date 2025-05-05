@@ -33,6 +33,15 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 [C:/Users/user/Desktop/ihec_library-/src/IHECLibrary/Views/AdminRegisterView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[C:/Users/user/Desktop/ihec_library-/src/IHECLibrary/Views/BookDetailsView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[C:/Users/user/Desktop/ihec_library-/src/IHECLibrary/Views/BorrowBookView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[C:/Users/user/Desktop/ihec_library-/src/IHECLibrary/Views/BorrowFormView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [C:/Users/user/Desktop/ihec_library-/src/IHECLibrary/Views/ChatbotView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 

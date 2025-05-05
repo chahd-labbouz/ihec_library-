@@ -1,0 +1,133 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:IHECLibrary.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             x:Class="IHECLibrary.Views.BookDetailsView"
+             x:DataType="vm:BookDetailsViewModel">
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    
+    <!-- Navigation bar -->
+    <Grid Grid.Row="0" Background="{StaticResource PrimaryBrush}" Height="60">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      
+      <!-- Logo and title -->
+      <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
+        <TextBlock Text="📚" FontSize="22" Margin="0,0,8,0" Foreground="White"/>
+        <TextBlock Text="IHEC BookZone" FontSize="22" FontWeight="SemiBold" Foreground="White"/>
+      </StackPanel>
+      
+      <!-- Center navigation menu -->
+      <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Button Content="Home" Command="{Binding NavigateToHomeCommand}" 
+                Background="Transparent" Foreground="White" 
+                Padding="12,8" Margin="5,0" CornerRadius="4"/>
+        <Button Content="Library" Command="{Binding NavigateToLibraryCommand}" 
+                Background="Transparent" Foreground="White" 
+                Padding="12,8" Margin="5,0" CornerRadius="4"/>
+        <Button Content="Profile" Command="{Binding NavigateToProfileCommand}" 
+                Background="Transparent" Foreground="White" 
+                Padding="12,8" Margin="5,0" CornerRadius="4"/>
+      </StackPanel>
+      
+      <!-- Right side: Profile -->
+      <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
+        <Button Content="Ask" Command="{Binding NavigateToChatbotCommand}" Padding="12,5" Margin="0,0,15,0" 
+                Background="White" Foreground="{StaticResource PrimaryBrush}" 
+                BorderBrush="White" BorderThickness="1" CornerRadius="4"/>
+        <Border CornerRadius="50" Width="32" Height="32" ClipToBounds="True" 
+                Margin="0,0,8,0" Background="{StaticResource PrimaryBrush}">
+          <Image Source="avares://IHECLibrary/Assets/balbouz.png" Stretch="UniformToFill"/>
+        </Border>
+      </StackPanel>
+    </Grid>
+    
+    <!-- Main content -->
+    <Grid Grid.Row="1" Background="White">
+      <Border Margin="50,30">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
+          
+          <!-- Back button -->
+          <Button Grid.Row="0" Content="← Retour" Command="{Binding GoBackCommand}" 
+                  Background="Transparent" Foreground="{StaticResource PrimaryBrush}" 
+                  Padding="0" Margin="0,0,0,20" FontSize="14"/>
+          
+          <!-- Book details -->
+          <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="300"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Book image -->
+            <Border Grid.Column="0" Margin="0,0,40,0">
+              <StackPanel>
+                <Image Source="avares://IHECLibrary/Assets/book.png" Width="250" Height="300" Stretch="Uniform" HorizontalAlignment="Center"/>
+                
+                <!-- Rating stars -->
+                <StackPanel Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Center">
+                  <TextBlock Text="★★★★★" Foreground="#FFD700" FontSize="18"/>
+                  <TextBlock Text="{Binding Book.Rating}" Margin="10,0,0,0" FontSize="16" VerticalAlignment="Center"/>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+            
+            <!-- Book info -->
+            <StackPanel Grid.Column="1" Margin="0,0,0,0">
+              <TextBlock Text="{Binding Book.Title}" FontSize="28" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,10"/>
+              <TextBlock Text="{Binding Book.Author}" FontSize="20" Opacity="0.8" Margin="0,0,0,20"/>
+              
+              <!-- Book details -->
+              <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="0,0,0,30">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="ISBN:" FontWeight="SemiBold" Margin="0,0,15,10"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Book.ISBN}" Margin="0,0,0,10"/>
+                
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Catégorie:" FontWeight="SemiBold" Margin="0,0,15,10"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Book.Category}" Margin="0,0,0,10"/>
+                
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Langue:" FontWeight="SemiBold" Margin="0,0,15,10"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Book.Language}" Margin="0,0,0,10"/>
+                
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Disponibilité:" FontWeight="SemiBold" Margin="0,0,15,10"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Book.AvailabilityStatus}" Foreground="{Binding Book.AvailabilityColor}" Margin="0,0,0,10"/>
+                
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Pages:" FontWeight="SemiBold" Margin="0,0,15,10"/>
+                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Book.PageCount}" Margin="0,0,0,10"/>
+              </Grid>
+              
+              <!-- Description -->
+              <TextBlock Text="Description" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10"/>
+              <TextBlock Text="{Binding Book.Description}" TextWrapping="Wrap" Margin="0,0,0,30"/>
+              
+              <!-- Buttons -->
+              <StackPanel Orientation="Horizontal">
+                <Button Content="Emprunter" Command="{Binding BorrowBookCommand}" 
+                        IsEnabled="{Binding Book.IsAvailable}"
+                        Background="{StaticResource PrimaryBrush}" Foreground="White"
+                        Width="120" Height="40" Margin="0,0,15,0"/>
+                
+                <Button Content="Détails" Command="{Binding ViewMoreDetailsCommand}" 
+                        Background="{StaticResource SecondaryBrush}" Foreground="Black"
+                        Width="120" Height="40"/>
+              </StackPanel>
+            </StackPanel>
+          </Grid>
+        </Grid>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl> 
