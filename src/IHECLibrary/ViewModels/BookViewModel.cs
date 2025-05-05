@@ -86,19 +86,9 @@ namespace IHECLibrary.ViewModels
                 Category = string.IsNullOrWhiteSpace(book.Category) ? "General" : book.Category;
                 
                 // Set cover image
-                if (!string.IsNullOrEmpty(book.CoverImageUrl) && Uri.IsWellFormedUriString(book.CoverImageUrl, UriKind.Absolute))
-                {
-                    CoverImageUrl = book.CoverImageUrl;
-                    Console.WriteLine($"Using book cover URL: {CoverImageUrl}");
-                }
-                else
-                {
-                    // Use a more reliable placeholder service with book title encoded properly
-                    string safeTitle = Uri.EscapeDataString(Title.Length > 10 ? Title.Substring(0, 10) : Title);
-                    // Using dummyimage.com which is very reliable
-                    CoverImageUrl = $"https://dummyimage.com/160x200/2e74a8/ffffff.png&text={safeTitle}";
-                    Console.WriteLine($"Using placeholder cover: {CoverImageUrl}");
-                }
+                // Always use the book.png image
+                CoverImageUrl = "avares://IHECLibrary/Assets/book.png";
+                Console.WriteLine($"Using book.png image for book: {Title}");
                 
                 // Set availability status
                 IsAvailable = book.IsAvailable();
@@ -125,7 +115,7 @@ namespace IHECLibrary.ViewModels
                 Title = "Book";
                 Author = "Author";
                 Category = "General";
-                CoverImageUrl = "https://placehold.co/200x300/2e74a8/ffffff?text=Book";
+                CoverImageUrl = "avares://IHECLibrary/Assets/book.png";
                 IsAvailable = true;
                 AvailabilityStatus = "Available";
                 AvailabilityColor = "#4CAF50";

@@ -23,10 +23,10 @@
       <StackPanel Margin="30,20" VerticalAlignment="Center">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
           <TextBlock Text="📚" FontSize="24" Margin="0,0,5,0" VerticalAlignment="Center"/>
-          <TextBlock Text="IHEC Library" FontSize="24" FontWeight="SemiBold" Foreground="#1a4b8a"/>
+          <TextBlock Text="IHEC BookZone" FontSize="24" FontWeight="SemiBold" Foreground="#1a4b8a"/>
         </StackPanel>
         
-        <TextBlock Text="Access the library resources of IHEC College" 
+        <TextBlock Text="Access the library resources of IHEC Carthage" 
                  FontSize="14" TextAlignment="Center" 
                  Foreground="#666666" Margin="0,0,0,20"/>
                  
@@ -113,9 +113,16 @@
     </Grid>
     
     <!-- Right side with welcome banner -->
-    <Grid Grid.Column="1" Background="#1a4b8a">
+    <Grid Grid.Column="1">
+      <Grid.Background>
+        <ImageBrush Source="/Assets/bib.jpg" Stretch="UniformToFill" />
+      </Grid.Background>
+      
+      <!-- Semi-transparent overlay for better readability -->
+      <Rectangle Fill="#661a4b8a" /> <!-- Using the same blue color with 40% opacity -->
+      
       <StackPanel VerticalAlignment="Center" Margin="40,20">
-        <TextBlock Text="Welcome to IHEC Library" 
+        <TextBlock Text="Welcome to IHEC BookZone" 
                    FontSize="28" FontWeight="SemiBold" 
                    Foreground="White" TextAlignment="Center"
                    Margin="0,0,0,15"/>

@@ -46,8 +46,8 @@
                 Background="White" Foreground="{StaticResource PrimaryBrush}" 
                 BorderBrush="White" BorderThickness="1" CornerRadius="4"/>
         <Border CornerRadius="50" Width="32" Height="32" ClipToBounds="True" 
-                Margin="0,0,8,0" Background="#F0F2F5">
-          <Image Source="{Binding UserProfilePicture}" Stretch="UniformToFill"/>
+                Margin="0,0,8,0" Background="{StaticResource PrimaryBrush}">
+          <Image Source="avares://IHECLibrary/Assets/balbouz.png" Stretch="UniformToFill"/>
         </Border>
       </StackPanel>
     </Grid>
@@ -107,7 +107,7 @@
                   
                   <!-- Book Cover Image in larger size -->
                   <Border Grid.Row="0" ClipToBounds="True" CornerRadius="6" Margin="0,0,0,10">
-                    <Image Source="{Binding CoverImageUrl}" Stretch="Uniform" Width="150" Height="180" HorizontalAlignment="Center"/>
+                    <Image Source="avares://IHECLibrary/Assets/book.png" Stretch="Uniform" Width="150" Height="180" HorizontalAlignment="Center"/>
                   </Border>
                   
                   <!-- Book Title -->

@@ -28,7 +28,7 @@ namespace IHECLibrary.ViewModels
         private string _userField = string.Empty;
 
         [ObservableProperty]
-        private string _userProfilePicture = "/Assets/default_profile.png"; // Default profile picture
+        private string _userProfilePicture = "avares://IHECLibrary/Assets/balbouz.png"; // Use balbouz.png as profile picture
 
         [ObservableProperty]
         private string _searchQuery = string.Empty;
@@ -429,14 +429,8 @@ namespace IHECLibrary.ViewModels
             Author = book.Author;
             
             // Initialize CoverImageUrl from book
-            CoverImageUrl = book.CoverImageUrl;
-            if (string.IsNullOrEmpty(CoverImageUrl))
-            {
-                // Fallback to a placeholder if empty
-                string safeTitle = Uri.EscapeDataString(Title.Length > 10 ? Title.Substring(0, 10) : Title);
-                CoverImageUrl = $"https://dummyimage.com/160x200/2e74a8/ffffff.png&text={safeTitle}";
-            }
-
+            CoverImageUrl = "avares://IHECLibrary/Assets/book.png";
+            
             // TODO: Replace with actual due date from the database once available
             var dueDate = DateTime.Now.AddDays(7); // Simulation
             DueDate = $"Due: {dueDate:dd/MM/yyyy}";
@@ -500,14 +494,8 @@ namespace IHECLibrary.ViewModels
             Author = book.Author;
             
             // Initialize CoverImageUrl from book
-            CoverImageUrl = book.CoverImageUrl;
-            if (string.IsNullOrEmpty(CoverImageUrl))
-            {
-                // Fallback to a placeholder if empty
-                string safeTitle = Uri.EscapeDataString(Title.Length > 10 ? Title.Substring(0, 10) : Title);
-                CoverImageUrl = $"https://dummyimage.com/160x200/2e74a8/ffffff.png&text={safeTitle}";
-            }
-
+            CoverImageUrl = "avares://IHECLibrary/Assets/book.png";
+            
             // Set reservation status based on book availability
             ReservationStatus = book.AvailableCopies > 0 ? "Available now" : "Waiting for availability";
         }

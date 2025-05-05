@@ -50,8 +50,8 @@
                 Background="White" Foreground="{StaticResource PrimaryBrush}" 
                 BorderBrush="White" BorderThickness="1" CornerRadius="4"/>
         <Border CornerRadius="50" Width="32" Height="32" ClipToBounds="True" 
-                Margin="0,0,8,0" Background="#F0F2F5">
-          <Image Source="{Binding UserProfilePicture}" Stretch="UniformToFill"/>
+                Margin="0,0,8,0" Background="{StaticResource PrimaryBrush}">
+          <Image Source="avares://IHECLibrary/Assets/balbouz.png" Stretch="UniformToFill"/>
         </Border>
       </StackPanel>
     </Grid>
@@ -156,7 +156,7 @@
                                 <Border Classes="card" Padding="10" Margin="0,5,0,5">
                                   <Grid ColumnDefinitions="Auto,*,Auto">
                                     <Border Grid.Column="0" ClipToBounds="True" CornerRadius="4" Width="50" Height="70" Margin="0,0,15,0">
-                                      <Image Source="{Binding CoverImageUrl}" Stretch="Uniform"/>
+                                      <Image Source="avares://IHECLibrary/Assets/book.png" Stretch="Uniform"/>
                                     </Border>
                                     
                                     <StackPanel Grid.Column="1">
