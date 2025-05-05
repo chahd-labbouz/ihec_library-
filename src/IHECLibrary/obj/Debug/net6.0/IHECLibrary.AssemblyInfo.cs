@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("IHECLibrary")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8b359b356fe189ec8e91e153999703ae51505581")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+37c07a15eeac06e4d2973a59c83b7854de62440f")]
 [assembly: System.Reflection.AssemblyProductAttribute("IHECLibrary")]
 [assembly: System.Reflection.AssemblyTitleAttribute("IHECLibrary")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -12,7 +12,7 @@ namespace IHECLibrary.Services.Implementations
     {
         private readonly string _apiKey;
         private readonly IBookService _bookService;
-        private readonly string _geminiApiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+        private readonly string _geminiApiUrl = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent";
 
         public GeminiChatbotService(string apiKey, IBookService bookService)
         {
@@ -29,7 +29,7 @@ namespace IHECLibrary.Services.Implementations
                 request.AddHeader("Content-Type", "application/json");
 
                 // Construire le prompt avec le contexte de la bibliothèque
-                var prompt = $@"Tu es HEC 1.0, l'assistant virtuel de la bibliothèque IHEC Carthage. 
+                var prompt = $@"Tu es l'assistant virtuel de IHEC BookZone, la bibliothèque IHEC Carthage. 
 Tu aides les étudiants à trouver des livres, à obtenir des informations sur la bibliothèque, 
 et à répondre à leurs questions académiques. Réponds en français de manière concise et utile.
 
@@ -41,6 +41,7 @@ Question de l'utilisateur: {userMessage}";
                     {
                         new
                         {
+                            role = "user",
                             parts = new[]
                             {
                                 new
@@ -49,6 +50,13 @@ Question de l'utilisateur: {userMessage}";
                                 }
                             }
                         }
+                    },
+                    generationConfig = new
+                    {
+                        temperature = 0.7,
+                        topK = 40,
+                        topP = 0.95,
+                        maxOutputTokens = 1024
                     }
                 };
 
@@ -80,9 +88,37 @@ Question de l'utilisateur: {userMessage}";
                         };
                     }
 
-                    // Use FirstOrDefault for safer access
-                    var responseText = geminiResponse.candidates?.FirstOrDefault()?.content?.parts?.FirstOrDefault()?.text
-                                       ?? "Je suis désolé, je n'ai pas pu traiter votre demande.";
+                    // Use FirstOrDefault for safer access with clear nullability checks
+                    string responseText;
+                    try 
+                    {
+                        var candidate = geminiResponse.candidates?.FirstOrDefault();
+                        if (candidate == null)
+                        {
+                            Console.WriteLine("Error: No candidates in Gemini response");
+                            responseText = "Je suis désolé, je n'ai pas pu générer une réponse. Veuillez réessayer.";
+                        }
+                        else if (candidate.content == null) 
+                        {
+                            Console.WriteLine("Error: Candidate has no content");
+                            responseText = "Je suis désolé, la réponse était vide. Veuillez réessayer.";
+                        }
+                        else if (candidate.content.parts == null || !candidate.content.parts.Any())
+                        {
+                            Console.WriteLine("Error: Content has no parts");
+                            responseText = "Je suis désolé, la réponse ne contenait pas de texte. Veuillez réessayer.";
+                        }
+                        else
+                        {
+                            responseText = candidate.content.parts.FirstOrDefault()?.text ?? 
+                                "Je suis désolé, je n'ai pas pu traiter votre demande.";
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error extracting response text: {ex.Message}");
+                        responseText = "Je suis désolé, une erreur s'est produite en traitant la réponse.";
+                    }
 
                     var chatbotResponse = new ChatbotResponse
                     {
@@ -108,9 +144,11 @@ Question de l'utilisateur: {userMessage}";
                 {
                     // Log the error details from the response if available
                     Console.WriteLine($"Error from Gemini API in GetResponseAsync: {response.StatusCode} - {response.ErrorMessage}");
+                    Console.WriteLine($"Response content: {response.Content}");
+                    
                     return new ChatbotResponse
                     {
-                        Message = "Je suis désolé, je rencontre des difficultés techniques. Veuillez réessayer plus tard.",
+                        Message = $"Je suis désolé, je rencontre des difficultés techniques. Détails de l'erreur: {response.StatusCode} - {response.ErrorMessage}",
                         Suggestions = GetDefaultSuggestions()
                     };
                 }
@@ -127,9 +165,10 @@ Question de l'utilisateur: {userMessage}";
             catch (Exception ex) // General catch block
             {
                 Console.WriteLine($"Error in GetResponseAsync: {ex.Message}"); // Log the exception
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return new ChatbotResponse
                 {
-                    Message = "Je suis désolé, une erreur s'est produite. Veuillez réessayer plus tard.",
+                    Message = $"Je suis désolé, une erreur s'est produite. Détails: {ex.Message}",
                     Suggestions = GetDefaultSuggestions()
                 };
             }
@@ -179,7 +218,7 @@ Question de l'utilisateur: {userMessage}";
                 var request = new RestRequest("", Method.Post);
                 request.AddHeader("Content-Type", "application/json");
 
-                var prompt = $@"Tu es HEC 1.0, l'assistant de recherche de la bibliothèque IHEC Carthage. 
+                var prompt = $@"Tu es l'assistant de recherche de IHEC BookZone, la bibliothèque IHEC Carthage. 
 Un étudiant te demande de l'aide pour sa recherche sur le sujet suivant : '{topic}'.
 Fournis des conseils méthodologiques, des suggestions de sources académiques, et des étapes 
 pour mener à bien cette recherche. Réponds en français de manière structurée et utile.";
@@ -190,6 +229,7 @@ pour mener à bien cette recherche. Réponds en français de manière structuré
                     {
                         new
                         {
+                            role = "user",
                             parts = new[]
                             {
                                 new
@@ -198,6 +238,13 @@ pour mener à bien cette recherche. Réponds en français de manière structuré
                                 }
                             }
                         }
+                    },
+                    generationConfig = new
+                    {
+                        temperature = 0.7,
+                        topK = 40,
+                        topP = 0.95,
+                        maxOutputTokens = 1024
                     }
                 };
 
@@ -276,7 +323,7 @@ Contact :
 - Bureau des bibliothécaires : 1er étage, salle 105
 ";
 
-                var prompt = $@"Tu es HEC 1.0, l'assistant virtuel de la bibliothèque IHEC Carthage. 
+                var prompt = $@"Tu es l'assistant virtuel de IHEC BookZone, la bibliothèque IHEC Carthage. 
 Un utilisateur te demande des informations sur la bibliothèque avec la question suivante : '{query}'.
 Utilise les informations ci-dessous pour répondre de manière précise et concise en français.
 
@@ -288,6 +335,7 @@ Utilise les informations ci-dessous pour répondre de manière précise et conci
                     {
                         new
                         {
+                            role = "user",
                             parts = new[]
                             {
                                 new
@@ -296,6 +344,13 @@ Utilise les informations ci-dessous pour répondre de manière précise et conci
                                 }
                             }
                         }
+                    },
+                    generationConfig = new
+                    {
+                        temperature = 0.7,
+                        topK = 40,
+                        topP = 0.95,
+                        maxOutputTokens = 1024
                     }
                 };
 
@@ -414,15 +469,18 @@ Utilise les informations ci-dessous pour répondre de manière précise et conci
     public class GeminiResponse
     {
         public List<Candidate>? candidates { get; set; }
+        public string? promptFeedback { get; set; }
     }
 
     public class Candidate
     {
         public Content? content { get; set; }
+        public string? finishReason { get; set; }
     }
 
     public class Content
     {
+        public string? role { get; set; }
         public List<Part>? parts { get; set; }
     }
 

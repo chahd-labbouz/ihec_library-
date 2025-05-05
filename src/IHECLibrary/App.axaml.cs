@@ -223,7 +223,7 @@ namespace IHECLibrary
                 new SupabaseBookService(supabaseClient, provider.GetRequiredService<IUserService>()));
             
             services.AddSingleton<IChatbotService>(provider => 
-                new GeminiChatbotService("AIzaSyAHGzJNWYMGDDsSzpAUFn92XjETHFjQ07c", provider.GetRequiredService<IBookService>()));
+                new GeminiChatbotService("AIzaSyCGcT-8yZ1sxg0Z3gHpx4vB6qzCVBPROCY", provider.GetRequiredService<IBookService>()));
             services.AddSingleton<IAdminService>(provider => 
                 new SupabaseAdminService(supabaseClient, provider.GetRequiredService<IAuthService>()));
             

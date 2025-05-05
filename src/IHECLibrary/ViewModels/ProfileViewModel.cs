@@ -28,12 +28,6 @@ namespace IHECLibrary.ViewModels
         private string _userField = string.Empty;
 
         [ObservableProperty]
-        private string _userRank = "Bronze"; // Default rank
-
-        [ObservableProperty]
-        private string _userRankColor = "#CD7F32"; // Default bronze color
-
-        [ObservableProperty]
         private string _userProfilePicture = "/Assets/default_profile.png"; // Default profile picture
 
         [ObservableProperty]
@@ -47,9 +41,6 @@ namespace IHECLibrary.ViewModels
 
         [ObservableProperty]
         private int _likedBooksCount = 0;
-
-        [ObservableProperty]
-        private double _progressValue = 25; // Default 25% progress (Bronze)
 
         [ObservableProperty]
         private ObservableCollection<BorrowedBookViewModel> _borrowedBooks = new();
@@ -195,13 +186,6 @@ namespace IHECLibrary.ViewModels
                     ReservedBooksCount = 0;
                     LikedBooksCount = 0;
                     
-                    // Set a default rank if we can't load statistics
-                    UserRank = "Bronze";
-                    UserRankColor = "#CD7F32"; // Default bronze color
-                    ProgressValue = 25; // Default 25% progress (Bronze)
-                    
-                    Console.WriteLine("ProfileViewModel: Set default statistics");
-                    
                     // Try to get actual statistics if available
                     try
                     {
@@ -213,9 +197,6 @@ namespace IHECLibrary.ViewModels
                             BorrowedBooksCount = statistics.BorrowedBooks.Count;
                             ReservedBooksCount = statistics.ReservedBooks.Count;
                             LikedBooksCount = statistics.LikedBooks.Count;
-                            
-                            // Set UserRank and related properties based on borrowed books count
-                            SetUserRankProperties(BorrowedBooksCount);
                             
                             Console.WriteLine($"ProfileViewModel: Loaded statistics - Borrowed: {BorrowedBooksCount}, Reserved: {ReservedBooksCount}, Liked: {LikedBooksCount}");
                             
@@ -273,35 +254,6 @@ namespace IHECLibrary.ViewModels
                 "M2" => "Master 2",
                 _ => level  // Keep the original value if it doesn't match any case
             };
-        }
-
-        // Helper method to set user rank properties based on borrowed books count
-        private void SetUserRankProperties(int borrowedCount)
-        {
-            if (borrowedCount >= 10)
-            {
-                UserRank = "Master";
-                UserRankColor = "#9932CC";
-                ProgressValue = 100;
-            }
-            else if (borrowedCount >= 5)
-            {
-                UserRank = "Gold";
-                UserRankColor = "#FFD700";
-                ProgressValue = 75;
-            }
-            else if (borrowedCount >= 2)
-            {
-                UserRank = "Silver";
-                UserRankColor = "#C0C0C0";
-                ProgressValue = 50;
-            }
-            else
-            {
-                UserRank = "Bronze";
-                UserRankColor = "#CD7F32";
-                ProgressValue = 25;
-            }
         }
 
         // Refresh the profile data

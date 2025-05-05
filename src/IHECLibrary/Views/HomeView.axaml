@@ -38,15 +38,12 @@
         <Button Content="Profile" Command="{Binding NavigateToProfileCommand}" 
                 Background="Transparent" Foreground="White" 
                 Padding="12,8" Margin="5,0" CornerRadius="4"/>
-        <Button Content="Contact" 
-                Background="Transparent" Foreground="White" 
-                Padding="12,8" Margin="5,0" CornerRadius="4"/>
       </StackPanel>
       
       <!-- Right side: Search and profile -->
       <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
-        <Button Content="Ask" Padding="12,5" Margin="0,0,15,0" 
-                Background="Transparent" Foreground="White" 
+        <Button Content="Ask" Command="{Binding NavigateToChatbotCommand}" Padding="12,5" Margin="0,0,15,0" 
+                Background="White" Foreground="{StaticResource PrimaryBrush}" 
                 BorderBrush="White" BorderThickness="1" CornerRadius="4"/>
         <Border CornerRadius="50" Width="32" Height="32" ClipToBounds="True" 
                 Margin="0,0,8,0" Background="#F0F2F5">

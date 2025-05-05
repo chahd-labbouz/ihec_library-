@@ -84,8 +84,8 @@ namespace IHECLibrary.ViewModels
                 // Ajouter un message de bienvenue du chatbot
                 var welcomeMessage = new ChatMessageViewModel
                 {
-                    SenderName = "HEC 1.0",
-                    Content = "Bonjour ! Je suis HEC 1.0, l'assistant virtuel de la bibliothèque IHEC Carthage. Comment puis-je vous aider aujourd'hui ?",
+                    SenderName = "IHEC Assistant",
+                    Content = "Bonjour ! Je suis l'assistant virtuel de IHEC BookZone, la bibliothèque d'IHEC Carthage. Comment puis-je vous aider aujourd'hui ?",
                     IsFromBot = true,
                     MessageBackground = "#E6F2F8",
                     MessageAlignment = "Left"
@@ -140,7 +140,7 @@ namespace IHECLibrary.ViewModels
                 // Créer le message du chatbot
                 var botMessage = new ChatMessageViewModel
                 {
-                    SenderName = "HEC 1.0",
+                    SenderName = "IHEC Assistant",
                     Content = botResponse.Message,
                     IsFromBot = true,
                     MessageBackground = "#E6F2F8",
@@ -172,7 +172,7 @@ namespace IHECLibrary.ViewModels
                 // Add error message to chat
                 var errorMessage = new ChatMessageViewModel
                 {
-                    SenderName = "HEC 1.0",
+                    SenderName = "IHEC Assistant",
                     Content = "Je suis désolé, une erreur s'est produite lors de l'envoi du message. Veuillez réessayer.",
                     IsFromBot = true,
                     MessageBackground = "#E6F2F8",
@@ -301,6 +301,7 @@ namespace IHECLibrary.ViewModels
         public string Id { get; }
         public string Title { get; }
         public string Author { get; }
+        public string CoverImageUrl { get; }
 
         private readonly INavigationService _navigationService;
 
@@ -310,6 +311,15 @@ namespace IHECLibrary.ViewModels
             Id = book.Id;
             Title = book.Title;
             Author = book.Author;
+            
+            // Initialize CoverImageUrl from book
+            CoverImageUrl = book.CoverImageUrl;
+            if (string.IsNullOrEmpty(CoverImageUrl))
+            {
+                // Fallback to a placeholder if empty
+                string safeTitle = Uri.EscapeDataString(Title.Length > 10 ? Title.Substring(0, 10) : Title);
+                CoverImageUrl = $"https://dummyimage.com/160x200/2e74a8/ffffff.png&text={safeTitle}";
+            }
         }
 
         [RelayCommand]
