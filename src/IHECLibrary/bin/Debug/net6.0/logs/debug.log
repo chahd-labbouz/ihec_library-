@@ -1918,3 +1918,17 @@ Inner Exception: The resource /Assets/admin_laptop.png could not be found.
 [2025-05-05 12:07:41.288] ViewLocator: Creating instance of IHECLibrary.Views.ChatbotView
 [2025-05-05 12:07:47.519] ViewLocator: Looking for view IHECLibrary.Views.HomeView for ViewModel IHECLibrary.ViewModels.HomeViewModel
 [2025-05-05 12:07:47.520] ViewLocator: Creating instance of IHECLibrary.Views.HomeView
+[2025-05-05 13:13:58.030] Application IHEC Library démarrée
+[2025-05-05 13:13:58.593] Creating MainWindow
+[2025-05-05 13:13:58.779] Setting up navigation service
+[2025-05-05 13:13:58.821] Application started successfully
+[2025-05-05 13:13:58.939] ViewLocator: Looking for view IHECLibrary.Views.LoginView for ViewModel IHECLibrary.ViewModels.LoginViewModel
+[2025-05-05 13:13:58.940] ViewLocator: Creating instance of IHECLibrary.Views.LoginView
+[2025-05-05 13:14:19.386] ViewLocator: Looking for view IHECLibrary.Views.HomeView for ViewModel IHECLibrary.ViewModels.HomeViewModel
+[2025-05-05 13:14:19.388] ViewLocator: Creating instance of IHECLibrary.Views.HomeView
+[2025-05-05 13:14:28.727] ViewLocator: Looking for view IHECLibrary.Views.BorrowFormView for ViewModel IHECLibrary.ViewModels.BorrowFormViewModel
+[2025-05-05 13:14:28.728] ViewLocator: Creating instance of IHECLibrary.Views.BorrowFormView
+[2025-05-05 13:14:35.386] ViewLocator: Looking for view IHECLibrary.Views.LibraryView for ViewModel IHECLibrary.ViewModels.LibraryViewModel
+[2025-05-05 13:14:35.387] ViewLocator: Creating instance of IHECLibrary.Views.LibraryView
+[2025-05-05 13:14:38.306] ViewLocator: Looking for view IHECLibrary.Views.BorrowFormView for ViewModel IHECLibrary.ViewModels.BorrowFormViewModel
+[2025-05-05 13:14:38.308] ViewLocator: Creating instance of IHECLibrary.Views.BorrowFormView
